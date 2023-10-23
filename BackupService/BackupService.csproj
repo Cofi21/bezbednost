@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{553B3A1D-089D-439A-B28E-7D919B2200B1}</ProjectGuid>
+    <ProjectGuid>{252AE224-98B3-45E4-B9A6-29476AE10A6C}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <RootNamespace>BackupService</RootNamespace>
     <AssemblyName>BackupService</AssemblyName>
