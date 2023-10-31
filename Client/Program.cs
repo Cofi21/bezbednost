@@ -12,11 +12,18 @@ namespace Client
     {
         static void Main(string[] args)
         {
+            NetTcpBinding binding = new NetTcpBinding();
+            string address = "net.tcp://localhost:4000/MainService";
 
-            using (var client = new ChannelFactory<IMain>("MainService"))
+            binding.Security.Mode = SecurityMode.Transport;
+            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
+            binding.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
+
+
+
+
+            using (ClientProxy proxy = new ClientProxy(binding, address))
             {
-                IMain proxy = client.CreateChannel();
-
                 while (true)
                 {
                     try
@@ -32,5 +39,7 @@ namespace Client
             }
                         
         }
+
+
     }
 }
