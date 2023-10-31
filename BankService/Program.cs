@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace BankService
             {
                 host.AddServiceEndpoint(typeof(IMain), binding, address);
                 host.Open();
-                Console.WriteLine("Server je pokrenut...");
+                Console.WriteLine("Server je pokrenut od strane " + WindowsIdentity.GetCurrent().Name);
                 Console.WriteLine("Pritisnite [Enter] za zaustavljanje servera!");
                 Console.ReadKey();
                 host.Close();

@@ -11,6 +11,6 @@ namespace Common
     public interface IMain
     {
         [OperationContract]
-        void Ispis();
+        void AddUser(string username, string password, string ime, string prezime);
     }
 }
