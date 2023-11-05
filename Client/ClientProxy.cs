@@ -1,7 +1,9 @@
 ﻿using Common;
+using Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -49,24 +51,76 @@ namespace Client
                     return;
             }
         }
+        static string ReadPassword()
+        {
+            string password = "";
+            ConsoleKeyInfo key;
+
+            while (true)
+            {
+                key = Console.ReadKey(true);
+
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    Console.WriteLine();
+                    break;
+                }
+                else if (key.Key == ConsoleKey.Backspace)
+                {
+                    if (password.Length > 0)
+                    {
+                        password = password.Remove(password.Length - 1);
+                        Console.Write("\b \b"); // Erase the character from the console
+                    }
+                }
+                else
+                {
+                    password += key.KeyChar;
+                    Console.Write("*"); // Display asterisks instead of the actual characters
+                }
+            }
+
+            return password;
+        }
         public void KreirajNalog()
         {
-            Console.Write("Unesite ime: ");
-            string ime = Console.ReadLine();
-            Console.Write("Unesite prezime: ");
-            string prezime = Console.ReadLine();
-            Console.Write("Unesite username: ");
-            string username = Console.ReadLine();
-            Console.Write("Unesite password: ");
-            string password = Console.ReadLine();
-            AddUser(username, password, ime, prezime);
-            Ispis();
+            string username = WindowsIdentity.GetCurrent().Name;
+            Console.Write("Unesite broj naloga: ");
+            string broj = Console.ReadLine(); 
+            Console.Write("Unesite PIN: ");
+            string pin = ReadPassword(); 
+            Console.Write("Potvrdite PIN: ");
+            string pinPotvrda = ReadPassword();
+
+            if (pin.Equals(pinPotvrda))
+            {
+                AddAccount(username, pin, broj);
+                Ispis();
+            }
+            else
+            {
+                Console.WriteLine("Greska! Uneti PIN kodovi se ne poklapaju.");
+                Ispis();
+            }
         }
-        public void AddUser(string username, string password, string ime, string prezime)
+        public void AddAccount(string username, string password, string broj)
         {
             try
             {
-                factory.AddUser(username, password, ime, prezime);
+                if (Database.UserAccountsDB.ContainsKey(broj))
+                {
+                    bool message = false;
+                    Console.WriteLine($"Nalog broj {broj} vec postoji!");
+                    factory.Message(message, new User(username, password, broj));
+                }
+                else
+                {
+                    bool message = true;
+                    Database.UserAccountsDB.Add(broj, new User(username, password, broj));
+                    factory.Message(message, new User(username, password, broj));
+                    Console.WriteLine($"Korisnik je uspesno kreirao nalog broj: {broj}.");
+                }
+
             }
             catch (Exception e)
             {
@@ -77,6 +131,17 @@ namespace Client
         public void PovuciSertifikat() { }
         public void IzvrsiTransakciju() { }
         public void ResetujPinKod() { }
-
+        public void Message(bool message, User u)
+        {
+            if (message)
+            {
+                Database.UserAccountsDB.Add(u.Broj, u);
+                Console.WriteLine($"Korisnik je uspesno kreirao nalog broj: {u.Broj}.");
+            }
+            else
+            {
+                Console.WriteLine($"Nalog broj {u.Broj} vec postoji!");
+            }
+        }
     }
 }

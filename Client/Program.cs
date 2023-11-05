@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,14 +21,13 @@ namespace Client
             binding.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
 
 
-
-
             using (ClientProxy proxy = new ClientProxy(binding, address))
             {
                 while (true)
                 {
                     try
                     {
+                        Console.WriteLine("Klijent je pokrenut od strane " + WindowsIdentity.GetCurrent().Name);
                         proxy.Ispis();
                         Console.ReadKey();
                     }
@@ -39,7 +39,5 @@ namespace Client
             }
                         
         }
-
-
     }
 }

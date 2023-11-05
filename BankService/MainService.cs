@@ -7,24 +7,23 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace BankService
 {
     
     public class MainService : IMain
     {
-        public static Dictionary<string, User> UserAccountsDB = new Dictionary<string, User>();
-
-        public void AddUser(string username, string password, string ime, string prezime)
+        public void Message(bool message, User u)
         {
-            if (UserAccountsDB.ContainsKey(username))
+            if (message)
             {
-                Console.WriteLine($"Korisnik {username} vec postoji");
+                Console.WriteLine($"Korisnik je uspesno kreirao nalog broj: {u.Broj}.");
             }
             else
             {
-                UserAccountsDB.Add(username, new User(username, password, ime, prezime));
-                Console.WriteLine($"Korisnik {username} je uspesno dodat!");
+                Console.WriteLine($"Nalog broj {u.Broj} vec postoji!");
             }
         }
+
     }
 }

@@ -2,16 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Common
 {
-    [ServiceContract]
-    public interface IMain
+    public class Database
     {
-        [OperationContract]
-        void Message(bool message, User u);
+        public static Dictionary<string, User> UserAccountsDB = new Dictionary<string, User>();
+
     }
 }
