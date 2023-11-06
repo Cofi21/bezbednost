@@ -1,33 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Common.Models
 {
+    [DataContract]
     public class User
     {
-        private string username;
-        private string password;
-     //   private string ime;
-       // private string prezime;
-        private string broj;
+        
+         string username;
+         string pin;
+         string broj;
 
 
         public User() { }
 
-        public User(string username, string password, string broj)
+        public User(string username, string pin, string broj)
         {
             this.username = username;
-            this.password = password;
+            this.pin = pin;
             this.broj = broj;
         }
 
-      //  public string Ime { get => ime; set => ime = value; }
-      //  public string Prezime { get => prezime; set => prezime = value; }
+         [DataMember]
         public string Username { get => username; set => username = value; }
-        public string Password { get => password; set => password = value; }
+          [DataMember]
+        public string Pin { get => pin; set => pin = value; }
+         [DataMember]
         public string Broj { get => broj; set => broj = value; }
 
         public override string ToString()

@@ -1,8 +1,10 @@
 ﻿using Common;
+using Common.Manager;
 using Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
@@ -13,8 +15,15 @@ namespace Client
     public class ClientProxy : ChannelFactory<IMain>, IMain, IDisposable
     {
         IMain factory;
-        public ClientProxy(NetTcpBinding binding, string address) : base(binding, address)
+        public ClientProxy(NetTcpBinding binding, EndpointAddress address) : base(binding, address)
         {
+            string cltCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
+
+            this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.Custom;
+            this.Credentials.ServiceCertificate.Authentication.CustomCertificateValidator = new ClientCertValidator();
+            this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
+
+            this.Credentials.ClientCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN);
             factory = this.CreateChannel();
         }
 
@@ -94,6 +103,7 @@ namespace Client
 
             if (pin.Equals(pinPotvrda))
             {
+
                 AddAccount(username, pin, broj);
                 Ispis();
             }
@@ -107,6 +117,7 @@ namespace Client
         {
             try
             {
+
                 if (Database.UserAccountsDB.ContainsKey(broj))
                 {
                     bool message = false;
@@ -120,11 +131,9 @@ namespace Client
                     factory.Message(message, new User(username, password, broj));
                     Console.WriteLine($"Korisnik je uspesno kreirao nalog broj: {broj}.");
                 }
-
-            }
-            catch (Exception e)
+            }catch(Exception ex)
             {
-                Console.WriteLine("Error: {0}", e.Message);
+                Console.WriteLine("Greska! " + ex.Message);
             }
         }
         
@@ -142,6 +151,16 @@ namespace Client
             {
                 Console.WriteLine($"Nalog broj {u.Broj} vec postoji!");
             }
+        }
+
+        public void Dispose()
+        {
+            if (factory != null)
+            {
+                factory = null;
+            }
+
+            this.Close();
         }
     }
 }

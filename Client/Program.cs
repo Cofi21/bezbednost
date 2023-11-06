@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 using Common;
+using Common.Manager;
 
 namespace Client
 {
@@ -13,13 +15,14 @@ namespace Client
     {
         static void Main(string[] args)
         {
+            string srvCertCN = "server";
+
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:4000/MainService";
+            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 
-            binding.Security.Mode = SecurityMode.Transport;
-            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
-            binding.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
-
+            /// Use CertManager class to obtain the certificate based on the "srvCertCN" representing the expected service identity.
+            X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);
+            EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:8000/MainService"), new X509CertificateEndpointIdentity(srvCert));
 
             using (ClientProxy proxy = new ClientProxy(binding, address))
             {
