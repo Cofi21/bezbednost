@@ -20,9 +20,15 @@ namespace Client
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
 
-            /// Use CertManager class to obtain the certificate based on the "srvCertCN" representing the expected service identity.
+
+          //  NetTcpBinding bindingWin = new NetTcpBinding();
+           // bindingWin.Security.Mode = SecurityMode.Transport;
+           // bindingWin.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
+           // bindingWin.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
+           
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);
             EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:8000/MainService"), new X509CertificateEndpointIdentity(srvCert));
+          //  EndpointAddress address2 = new EndpointAddress(new Uri("net.tcp://localhost:4000/MainService"), new X509CertificateEndpointIdentity(srvCert));
 
             using (ClientProxy proxy = new ClientProxy(binding, address))
             {

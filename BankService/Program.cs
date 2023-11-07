@@ -20,19 +20,24 @@ namespace BankService
 
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
+           
+         //   NetTcpBinding bindingWin = new NetTcpBinding();
+         //   bindingWin.Security.Mode = SecurityMode.Transport;
+         //   bindingWin.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
+         //   bindingWin.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
+
 
             string address = "net.tcp://localhost:8000/MainService";
+          //  string address2 = "net.tcp://localhost:4000/MainService";
             ServiceHost host = new ServiceHost(typeof(MainService));
             host.AddServiceEndpoint(typeof(IMain), binding, address);
+          //  host.AddServiceEndpoint(typeof(IMain), bindingWin, address2);
 
-            ///Custom validation mode enables creation of a custom validator - CustomCertificateValidator
             host.Credentials.ClientCertificate.Authentication.CertificateValidationMode = X509CertificateValidationMode.Custom;
             host.Credentials.ClientCertificate.Authentication.CustomCertificateValidator = new ServiceCertValidator();
 
-            ///If CA doesn't have a CRL associated, WCF blocks every client because it cannot be validated
             host.Credentials.ClientCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
 
-            ///Set appropriate service's certificate on the host. Use CertManager class to obtain the certificate based on the "srvCertCN"
             host.Credentials.ServiceCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, srvCertCN);
 
             try
