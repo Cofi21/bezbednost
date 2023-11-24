@@ -47,7 +47,6 @@ namespace BankService
                 {
                     hostWin.Open();
                     Console.WriteLine("Windows server");
-
                     /// OVDE ON NIKADA NE UDJE, TREBAMO MU SAMO NEKAKO PROSLEDITI DA PROVERI KADA KOJU VRSTU KOMUNIKACIJE KORISTIMO
                     if (MainService.Odgovor == 1)
                     {

@@ -14,5 +14,7 @@ namespace Common
         [OperationContract]
         void Message(bool message, User u);
 
+        [OperationContract]
+        void AddAccount(string username, string password, string broj, IMain factory);
     }
 }

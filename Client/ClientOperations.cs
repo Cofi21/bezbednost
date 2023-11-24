@@ -24,10 +24,10 @@ namespace Client
                     clientOperations.IzdajKarticu(certFactory);
                     break;
                 case 3:
-                    PovuciSertifikat();
+                    clientOperations.PovuciSertifikat();
                     break;
                 case 4:
-                    IzvrsiTransakciju();
+                    clientOperations.IzvrsiTransakciju();
                     break;
                 case 5:
                     ResetujPinKod();
@@ -68,7 +68,7 @@ namespace Client
 
             return password;
         }
-        public  void KreirajNalog(IMain factory)
+        public void KreirajNalog(IMain factory)
         {
 
             string username = WindowsIdentity.GetCurrent().Name;
@@ -82,47 +82,51 @@ namespace Client
             if (pin.Equals(pinPotvrda))
             {
 
-                AddAccount(username, pin, broj, factory);
+                factory.AddAccount(username, pin, broj, factory);
             }
             else
             {
                 Console.WriteLine("Greska! Uneti PIN kodovi se ne poklapaju.");
             }
         }
-        public static void AddAccount(string username, string password, string broj, IMain factory)
-        {
-            try
-            {
+      
+        //Implementirano na serveru da bi mogli da generisemo i sertifikate pri kreiranju naloga
+        //public static void AddAccount(string username, string password, string broj, IMain factory)
+        //{
+        //    try
+        //    {
 
-                if (Database.UserAccountsDB.ContainsKey(broj))
-                {
-                    bool message = false;
-                    Console.WriteLine($"Nalog broj {broj} vec postoji!");
-                    factory.Message(message, new User(username, password, broj));
-                }
-                else
-                {
-                    bool message = true;
-                    Database.UserAccountsDB.Add(broj, new User(username, password, broj));
-                    factory.Message(message, new User(username, password, broj));
-                    Console.WriteLine($"Korisnik je uspesno kreirao nalog broj: {broj}.");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("Greska! " + ex.Message);
-            }
-        }
+        //        if (Database.UserAccountsDB.ContainsKey(broj))
+        //        {
+        //            bool message = false;
+        //            Console.WriteLine($"Nalog broj {broj} vec postoji!");
+        //            factory.Message(message, new User(username, password, broj));
+        //        }
+        //        else
+        //        {
+        //            bool message = true;
+        //            Database.UserAccountsDB.Add(broj, new User(username, password, broj));
+        //            factory.Message(message, new User(username, password, broj));
+        //            Console.WriteLine($"Korisnik je uspesno kreirao nalog broj: {broj}.");
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine("Greska! " + ex.Message);
+        //    }
+        //}
 
-        public static void PovuciSertifikat() { }
-        public  void IzdajKarticu( ICert certFactory)
+        public void PovuciSertifikat() { }
+        public void IzdajKarticu(ICert certFactory)
         {
             certFactory.Connection();
             Console.WriteLine("Kartica je uspesno izdata.");
         }
-        public static void IzvrsiTransakciju()
+        public void IzvrsiTransakciju()
         {
-
+            Console.WriteLine("Izaberite zahtev: ");
+            Console.WriteLine("\t1 - Uplata novca");
+            Console.WriteLine("\t2 - Izdavanje kartice");
         }
         public static void ResetujPinKod() { }
 

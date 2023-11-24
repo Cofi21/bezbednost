@@ -10,6 +10,5 @@ namespace Common
     public class Database
     {
         public static Dictionary<string, User> UserAccountsDB = new Dictionary<string, User>();
-
     }
 }
