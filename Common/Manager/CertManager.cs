@@ -15,8 +15,6 @@ namespace Common.Manager
 			store.Open(OpenFlags.ReadOnly);
 
 			X509Certificate2Collection certCollection = store.Certificates.Find(X509FindType.FindBySubjectName, subjectName, true);
-
-			/// Check whether the subjectName of the certificate is exactly the same as the given "subjectName"
 			foreach (X509Certificate2 c in certCollection)
 			{
 				if (c.SubjectName.Name.Equals(string.Format("CN={0}", subjectName)))

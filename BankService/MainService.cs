@@ -10,9 +10,17 @@ using System.Threading.Tasks;
 
 namespace BankService
 {
-    
-    public class MainService : IMain
+    /// TREBA RESITI OVAJ ISPIS NA SERVERU NE RADI, --> na serveru nastavak komentara
+    public class MainService : IMain, ICert
     {
+        public static int Odgovor;
+        public int Connection()
+        {
+            Console.WriteLine("Uspesan sertifikat");
+            Odgovor = 1;
+            return 1;
+        }
+
         public void Message(bool message, User u)
         {
             if (message)

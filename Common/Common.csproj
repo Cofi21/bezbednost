@@ -45,11 +45,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Database.cs" />
+    <Compile Include="ICert.cs" />
     <Compile Include="IMain.cs" />
     <Compile Include="Manager\CertManager.cs" />
-    <Compile Include="Manager\ClientCertValidator.cs" />
     <Compile Include="Manager\Formatter.cs" />
-    <Compile Include="Manager\ServiceCertValidator.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
