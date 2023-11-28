@@ -46,8 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientCert.cs" />
-    <Compile Include="ClientOperations.cs" />
-    <Compile Include="ClientProxy.cs" />
+    <Compile Include="ClientWin.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

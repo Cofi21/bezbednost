@@ -1,10 +1,18 @@
 -------------- COFI ------------------
-Zavrsiti implementaciju komunkacije preko sertifikata i win auth
-Trebalo bi da radi na grubo, ali treba resiti jos neke greskice i napraviti ispis na serveru
-Podeljene klase na klijentu, jedna za operacije i 2 za interfejse i kanale za komunikaciju
-Napravljeni sertifikati za server, mastercard, i po sertifikat za svakog usera na kompu posebno(zbog digitalnog potpisa kasnije)
-Kod mene su User - i pera, marko, veljko. Svaki ima sifru 1234. Sifra za sve kod sertifikata je 1234. Za server su i username i pass server
+Zavrsiti implementaciju komunkacije preko sertifikata i win auth.
+Trebalo bi da radi na grubo, ali treba resiti jos neke greskice i napraviti ispis na serveru.
+Podeljene klase na klijentu, jedna za operacije i 2 za interfejse i kanale za komunikaciju.
+Napravljeni sertifikati za server, mastercard, i po sertifikat za svakog usera na kompu posebno(zbog digitalnog potpisa kasnije).
+Kod mene su User - i pera, marko, veljko. Svaki ima sifru 1234. Sifra za sve kod sertifikata je 1234. Za server su i username i pass server.
 Server puca prijavljuje da postoji vec objekat sa datim kljucem iako je baza prazna, verovatno nesto oko statickih polja moramo resiti to.
 Ugl ima komentara po kodu...
+
 ------------- Marko -------------------
-Treba srediti komunikaciju (Srediti izbor protokola). Dodeliti mastercard karticu (napraviti model mastercard kartice) korisniku prilikom kreiranja naloga (pin proslediti objektu mastercard). 
+Treba srediti komunikaciju (Srediti izbor protokola).
+Dodeliti mastercard karticu (napraviti model mastercard kartice) korisniku prilikom kreiranja naloga (pin proslediti objektu mastercard). 
+
+------------- COFI --------------------
+Implementirani protokoli, kreiranje naloga i vrsenje transakcija.
+Potrebno je dodati digitalne potpise, kriptografiju PIN koda, cuvanje svega u datoteku.
+Takodje, zavrsiti implementaciju ostalih opcija korisnika.
+Nije implemenirana dodela MasterCard sertifikata prilikom kreiranja naloga, dodati i to.

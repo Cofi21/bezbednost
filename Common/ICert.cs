@@ -10,8 +10,14 @@ namespace Common
     [ServiceContract]
     public interface ICert
     {
-        [OperationContract]
+         [OperationContract]
+        void TestCommunication();
 
-        int Connection();
+        [OperationContract]
+        bool ResetujPinKod();
+
+
+        [OperationContract]
+        bool IzvrsiTransakciju(int opcija, string brojRacuna, double svota);
     }
 }

@@ -10,31 +10,32 @@ namespace Common.Models
     [DataContract]
     public class User
     {
-        
-         string username;
-         string pin;
-         string broj;
+        private string broj;
+        private double stanje;
+        private MasterCard masterCard;
 
 
         public User() { }
 
-        public User(string username, string pin, string broj)
+        public User(string username, string broj, MasterCard master)
         {
-            this.username = username;
-            this.pin = pin;
+            this.stanje = 0;
             this.broj = broj;
+            MasterCardProp = master;
         }
 
-         [DataMember]
-        public string Username { get => username; set => username = value; }
-          [DataMember]
-        public string Pin { get => pin; set => pin = value; }
-         [DataMember]
+        [DataMember]
+        public MasterCard MasterCardProp { get => masterCard; set => masterCard = value; }
+
+        [DataMember]
         public string Broj { get => broj; set => broj = value; }
+        
+        [DataMember]
+        public double Stanje { get => stanje; set => stanje = value; }
 
         public override string ToString()
         {
-            return $"Usename: {Username}, Naziv naloga: {Broj}";
+            return $"Broj naloga: {Broj}, naziv naloga: {MasterCardProp.SubjectName}";
         }
 
     }

@@ -9,12 +9,22 @@ using System.Threading.Tasks;
 namespace Common
 {
     [ServiceContract]
-    public interface IMain
+    public interface IWin
     {
         [OperationContract]
-        void Message(bool message, User u);
+        void TestCommunication();
+
 
         [OperationContract]
-        void AddAccount(string username, string password, string broj, IMain factory);
+        bool KreirajNalog(User u);
+
+
+        [OperationContract]
+        bool IzdajKarticu();
+
+
+        [OperationContract]
+        bool PovuciSertifikat();
+
     }
 }

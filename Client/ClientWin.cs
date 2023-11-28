@@ -1,5 +1,6 @@
 ﻿using Common;
 using Common.Manager;
+using Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,29 +13,22 @@ using System.Threading.Tasks;
 
 namespace Client
 {
-    public class ClientCert : ChannelFactory<ICert>, ICert
+    public class ClientWin : ChannelFactory<IWin>, IWin, IDisposable
     {
-        ICert factory;
+        IWin factory;
 
-        public ClientCert(Binding binding, EndpointAddress remoteAddress) : base(binding, remoteAddress)
+        public ClientWin(NetTcpBinding binding, string address) : base(binding, address)
         {
             try
             {
-
-                string cltCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
-
-                this.Credentials.ServiceCertificate.Authentication.CertificateValidationMode = System.ServiceModel.Security.X509CertificateValidationMode.ChainTrust;
-                this.Credentials.ServiceCertificate.Authentication.RevocationMode = X509RevocationMode.NoCheck;
-
-                this.Credentials.ClientCertificate.Certificate = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, cltCertCN);
-
                 factory = this.CreateChannel();
-            }
-            catch (Exception ex)
+                
+            }catch(Exception ex)
             {
                 Console.WriteLine("Greska u konstruktoru " + ex);
             }
         }
+
 
         public void Dispose()
         {
@@ -47,6 +41,11 @@ namespace Client
         }
 
 
+
+        public bool KreirajNalog(User u)
+        {
+            return factory.KreirajNalog(u);
+        }
 
         public void TestCommunication()
         {
@@ -61,16 +60,17 @@ namespace Client
             }
         }
 
-
-        public bool ResetujPinKod()
+        public bool IzdajKarticu()
         {
-            return factory.ResetujPinKod();
+            return factory.IzdajKarticu();
         }
 
-        public bool IzvrsiTransakciju(int opcija, string brojRacuna, double svota)
+        public bool PovuciSertifikat()
         {
-            return factory.IzvrsiTransakciju(opcija, brojRacuna, svota);
+            return factory.PovuciSertifikat();
         }
+
+
 
     }
 }
