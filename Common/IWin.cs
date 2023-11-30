@@ -20,10 +20,6 @@ namespace Common
 
 
         [OperationContract]
-        bool IzdajKarticu();
-
-
-        [OperationContract]
         bool PovuciSertifikat();
 
     }

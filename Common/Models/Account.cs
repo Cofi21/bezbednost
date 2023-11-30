@@ -27,7 +27,10 @@ namespace Common.Models
         [DataMember]
         public MasterCard MasterCardProp { get => masterCard; set => masterCard = value; }
 
-        public Account() { }
+        public Account() 
+        {
+            Stanje = 0;
+        }
 
         public Account(string brojRacuna, string pin)
         {

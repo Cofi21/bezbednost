@@ -21,23 +21,25 @@ namespace BankService
         public bool KreirajNalog(Account acc)
         {
             string name = WindowsIdentity.GetCurrent().Name;
-            if (Database.UsersDB[name].userAccounts.ContainsKey(acc.BrojRacuna))
+            if (Database.UsersDB[name].UserAccounts.ContainsKey(acc.BrojRacuna))
             {
                 Console.WriteLine("Vec postoji racun sa unetim brojem!");
                 return false;
             }
             else{
-                acc.MasterCardProp.SubjectName = name;
-                acc.MasterCardProp.Pin = acc.Pin;
-                Database.UsersDB[name].userAccounts.Add(acc.BrojRacuna, acc);
+                Database.UsersDB[name].UserAccounts.Add(acc.BrojRacuna, acc);
+                Database.AllUserAccountsDB.Add(acc.BrojRacuna, acc);
+                IzdajKarticu(acc, name);
                 Console.WriteLine("Uspesno");
                 return true;
             }
         }
 
-        public bool IzdajKarticu()
+        public void IzdajKarticu(Account acc, string username)
         {
-            throw new NotImplementedException();
+            // MasterCard parametri
+            acc.MasterCardProp.SubjectName = username;
+            acc.MasterCardProp.Pin = acc.Pin;
         }
 
         public bool PovuciSertifikat()

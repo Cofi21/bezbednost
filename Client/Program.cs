@@ -14,7 +14,7 @@ namespace Client
         {     
             if(!Database.UsersDB.ContainsKey(WindowsIdentity.GetCurrent().Name))
             {
-                Database.UsersDB.Add(WindowsIdentity.GetCurrent().Name, new User(WindowsIdentity.GetCurrent().Name, null));
+                Database.UsersDB.Add(WindowsIdentity.GetCurrent().Name, new User(WindowsIdentity.GetCurrent().Name));
             }
 
             while (true)
@@ -46,7 +46,7 @@ namespace Client
             return izbor;
         }
 
-        static void CertConnection()
+        static void CertConnection(int operacija)
         {
             string srvCertCN = "server";
 
@@ -112,8 +112,8 @@ namespace Client
                     switch (broj)
                     {
                         case 1:
-                            User u = KreirajNalog();
-                            if (proxy.KreirajNalog(u))
+                            Account acc = KreirajNalog();
+                            if (proxy.KreirajNalog(acc))
                             {
                                 Console.WriteLine("Cestitamo! Uspesno ste kreirali nalog!");
                             }

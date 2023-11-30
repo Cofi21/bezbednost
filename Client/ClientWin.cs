@@ -42,9 +42,9 @@ namespace Client
 
 
 
-        public bool KreirajNalog(User u)
+        public bool KreirajNalog(Account acc)
         {
-            return factory.KreirajNalog(u);
+            return factory.KreirajNalog(acc);
         }
 
         public void TestCommunication()
@@ -58,11 +58,6 @@ namespace Client
                 Console.WriteLine("[TestCommunication] ERROR = {0}", e.Message);
                 Console.WriteLine(e.StackTrace);
             }
-        }
-
-        public bool IzdajKarticu()
-        {
-            return factory.IzdajKarticu();
         }
 
         public bool PovuciSertifikat()

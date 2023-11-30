@@ -11,16 +11,15 @@ namespace Common.Models
     public class User
     {
         private string username;
-        public Dictionary<string, Account> userAccounts { get; set; }
+        public Dictionary<string, Account> UserAccounts { get; set; }
 
 
         public User() {}
 
-        public User(string username, MasterCard master)
+        public User(string username)
         {
             this.username = username;
-            MasterCardProp = master;
-            this.userAccounts = new Dictionary<string, Account>();
+            this.UserAccounts = new Dictionary<string, Account>();
         }
 
 
@@ -29,7 +28,7 @@ namespace Common.Models
 
         public override string ToString()
         {
-            return $"Username: {username}, naziv naloga: {MasterCardProp.SubjectName}";
+            return $"Username: {username}";
         }
 
     }
