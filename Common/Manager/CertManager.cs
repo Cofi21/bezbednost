@@ -26,7 +26,7 @@ namespace Common.Manager
 			return null;
 		}
 
-		public static X509Certificate2 GetCertificateFromFile(string fileName)
+		public static X509Certificate2 GetCertificateFromFile()
 		{
 			X509Certificate2 certificate = null;
 
@@ -34,7 +34,7 @@ namespace Common.Manager
 			return certificate;
 		}
 
-		public static X509Certificate2 GetCertificateFromFile(string fileName, SecureString pwd)
+		public static X509Certificate2 GetCertificateFromFile(SecureString pwd)
 		{
 			X509Certificate2 certificate = null;
 

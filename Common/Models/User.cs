@@ -10,32 +10,26 @@ namespace Common.Models
     [DataContract]
     public class User
     {
-        private string broj;
-        private double stanje;
-        private MasterCard masterCard;
+        private string username;
+        public Dictionary<string, Account> userAccounts { get; set; }
 
 
-        public User() { }
+        public User() {}
 
-        public User(string username, string broj, MasterCard master)
+        public User(string username, MasterCard master)
         {
-            this.stanje = 0;
-            this.broj = broj;
+            this.username = username;
             MasterCardProp = master;
+            this.userAccounts = new Dictionary<string, Account>();
         }
 
-        [DataMember]
-        public MasterCard MasterCardProp { get => masterCard; set => masterCard = value; }
 
         [DataMember]
-        public string Broj { get => broj; set => broj = value; }
-        
-        [DataMember]
-        public double Stanje { get => stanje; set => stanje = value; }
+        public string Username { get => username; set => username = value; }
 
         public override string ToString()
         {
-            return $"Broj naloga: {Broj}, naziv naloga: {MasterCardProp.SubjectName}";
+            return $"Username: {username}, naziv naloga: {MasterCardProp.SubjectName}";
         }
 
     }

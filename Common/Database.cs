@@ -9,6 +9,7 @@ namespace Common
 {
     public class Database
     {
-        public static Dictionary<string, User> UserAccountsDB = new Dictionary<string, User>();
+        public static Dictionary<string, User> UsersDB = new Dictionary<string, User>();
+        public static Dictionary<string, User> AllUserAccountsDB = new Dictionary<string, User>();
     }
 }

@@ -16,7 +16,7 @@ namespace Common
 
 
         [OperationContract]
-        bool KreirajNalog(User u);
+        bool KreirajNalog(Account acc);
 
 
         [OperationContract]

@@ -12,6 +12,11 @@ namespace Client
     {
         static void Main(string[] args)
         {     
+            if(!Database.UsersDB.ContainsKey(WindowsIdentity.GetCurrent().Name))
+            {
+                Database.UsersDB.Add(WindowsIdentity.GetCurrent().Name, new User(WindowsIdentity.GetCurrent().Name, null));
+            }
+
             while (true)
             {
                 int operacija = Meni();
@@ -41,7 +46,7 @@ namespace Client
             return izbor;
         }
 
-        static void CertConnection(int broj)
+        static void CertConnection()
         {
             string srvCertCN = "server";
 
@@ -169,9 +174,9 @@ namespace Client
 
             return password;
         }
-        public static User KreirajNalog()
+        public static Account KreirajNalog()
         {
-            string username = WindowsIdentity.GetCurrent().Name;
+            //string username = WindowsIdentity.GetCurrent().Name;
             Console.Write("Unesite broj naloga: ");
             string broj = Console.ReadLine();
             Console.Write("Unesite PIN: ");
@@ -181,7 +186,7 @@ namespace Client
 
             if (pin.Equals(pinPotvrda))
             {
-                return new User(username, broj, new MasterCard(username, pin));
+                return new Account(broj, pin);
             }
             else
             {

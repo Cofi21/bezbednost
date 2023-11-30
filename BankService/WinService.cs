@@ -18,15 +18,18 @@ namespace BankService
             Console.WriteLine("Communication established.");
         }
 
-        public bool KreirajNalog(User u)
+        public bool KreirajNalog(Account acc)
         {
-            if (Database.UserAccountsDB.ContainsKey(u.Broj))
+            string name = WindowsIdentity.GetCurrent().Name;
+            if (Database.UsersDB[name].userAccounts.ContainsKey(acc.BrojRacuna))
             {
                 Console.WriteLine("Vec postoji racun sa unetim brojem!");
                 return false;
             }
             else{
-                Database.UserAccountsDB.Add(u.Broj, u);
+                acc.MasterCardProp.SubjectName = name;
+                acc.MasterCardProp.Pin = acc.Pin;
+                Database.UsersDB[name].userAccounts.Add(acc.BrojRacuna, acc);
                 Console.WriteLine("Uspesno");
                 return true;
             }

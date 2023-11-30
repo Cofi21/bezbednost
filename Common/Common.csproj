@@ -49,6 +49,7 @@
     <Compile Include="IWin.cs" />
     <Compile Include="Manager\CertManager.cs" />
     <Compile Include="Manager\Formatter.cs" />
+    <Compile Include="Models\Account.cs" />
     <Compile Include="Models\MasterCard.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
