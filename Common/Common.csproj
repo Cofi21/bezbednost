@@ -44,11 +44,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="3DES_Symm_Algorithm.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="ICert.cs" />
     <Compile Include="IWin.cs" />
     <Compile Include="Manager\CertManager.cs" />
     <Compile Include="Manager\Formatter.cs" />
+    <Compile Include="Manager\SecretKey.cs" />
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\MasterCard.cs" />
     <Compile Include="Models\User.cs" />
