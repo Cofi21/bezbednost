@@ -37,9 +37,9 @@ namespace BankService
             string name = WindowsIdentity.GetCurrent().Name;
             if (opcija == 1)
             {
-                if (Database.AllUserAccountsDB.ContainsKey(brojRacuna))
+                if (IMDatabase.AllUserAccountsDB.ContainsKey(brojRacuna))
                 {
-                    Database.AllUserAccountsDB[brojRacuna].Stanje += svota;
+                    IMDatabase.AllUserAccountsDB[brojRacuna].Stanje += svota;
                     Console.WriteLine($"Uspesna uplata!");
                     return true;
                 }
@@ -51,16 +51,16 @@ namespace BankService
             }
             else if(opcija == 2)
             {
-                if (Database.AllUserAccountsDB.ContainsKey(brojRacuna))
+                if (IMDatabase.AllUserAccountsDB.ContainsKey(brojRacuna))
                 {
-                    double trenutnoStanje = Database.AllUserAccountsDB[brojRacuna].Stanje;
+                    double trenutnoStanje = IMDatabase.AllUserAccountsDB[brojRacuna].Stanje;
 
                     if(trenutnoStanje < svota)
                     {
                         Console.WriteLine($"Na racunu nemate dovoljno sretstava za isplatu!");
                         return false;
                     }
-                    Database.AllUserAccountsDB[brojRacuna].Stanje -= svota;
+                    IMDatabase.AllUserAccountsDB[brojRacuna].Stanje -= svota;
                     Console.WriteLine($"Uspesna isplata!");
                     return true;
                 }

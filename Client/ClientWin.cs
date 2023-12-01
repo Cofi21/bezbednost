@@ -65,7 +65,19 @@ namespace Client
             return factory.PovuciSertifikat();
         }
 
+        public bool ResetujPinKod(string pin, string brojNaloga)
+        {
+            return factory.ResetujPinKod(pin, brojNaloga);
+        }
 
+        public Dictionary<string, Account> ReadDict()
+        {
+            return factory.ReadDict();
+        }
 
+        public Dictionary<string, User> ReadDictUsers()
+        {
+            return factory.ReadDictUsers();
+        }
     }
 }

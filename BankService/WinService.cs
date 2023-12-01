@@ -21,25 +21,40 @@ namespace BankService
         public bool KreirajNalog(Account acc)
         {
             string name = WindowsIdentity.GetCurrent().Name;
-            if (Database.UsersDB[name].UserAccounts.ContainsKey(acc.BrojRacuna))
+            if(!IMDatabase.UsersDB.ContainsKey(name))
             {
-                Console.WriteLine("Vec postoji racun sa unetim brojem!");
+                IMDatabase.UsersDB.Add(name, new User(name));
+            }
+            Console.WriteLine("Nalog kreiran");
+            try
+            {
+                if (IMDatabase.AllUserAccountsDB.ContainsKey(acc.BrojRacuna))
+                {
+                    Console.WriteLine("Vec postoji racun sa unetim brojem!");
+                    return false;
+                }
+                else
+                {
+                    MasterCard mc = new MasterCard(name, acc.Pin);
+                    acc.MasterCards.Add(mc);
+
+                    IMDatabase.UsersDB[name].UserAccounts.Add(acc.BrojRacuna, acc);
+                    IMDatabase.AllUserAccountsDB.Add(acc.BrojRacuna, acc);
+
+                    //Ispis radi provere
+                    foreach(Account ac in IMDatabase.AllUserAccountsDB.Values)
+                    {
+                        Console.WriteLine(ac.ToString());
+                    }
+                    Console.WriteLine("Uspesno");
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message + "\n" + e.StackTrace);
                 return false;
             }
-            else{
-                Database.UsersDB[name].UserAccounts.Add(acc.BrojRacuna, acc);
-                Database.AllUserAccountsDB.Add(acc.BrojRacuna, acc);
-                IzdajKarticu(acc, name);
-                Console.WriteLine("Uspesno");
-                return true;
-            }
-        }
-
-        public void IzdajKarticu(Account acc, string username)
-        {
-            // MasterCard parametri
-            acc.MasterCardProp.SubjectName = username;
-            acc.MasterCardProp.Pin = acc.Pin;
         }
 
         public bool PovuciSertifikat()
@@ -47,11 +62,36 @@ namespace BankService
             throw new NotImplementedException();
         }
 
-        public bool ResetujPinKod()
+        public bool ResetujPinKod(string pin, string brojNaloga)
         {
-            throw new NotImplementedException();
+            if (IMDatabase.AllUserAccountsDB.ContainsKey(brojNaloga.Trim()))
+            {
+                IMDatabase.AllUserAccountsDB[brojNaloga].Pin = pin;
+                foreach(MasterCard mc in IMDatabase.AllUserAccountsDB[brojNaloga].MasterCards)
+                {
+                    if(mc.SubjectName.Equals(WindowsIdentity.GetCurrent().Name))
+                    {
+                        mc.Pin = pin;
+                    }
+                }
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
         }
 
+        public Dictionary<string, Account> ReadDict()
+        {
+            return IMDatabase.AllUserAccountsDB;
+        }
 
+        public Dictionary<string, User> ReadDictUsers()
+        {
+            return IMDatabase.UsersDB;
+        }
     }
 }

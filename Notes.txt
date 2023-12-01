@@ -18,3 +18,46 @@ Takodje, zavrsiti implementaciju ostalih opcija korisnika.
 Nije implemenirana dodela MasterCard sertifikata prilikom kreiranja naloga, dodati i to.
 ------------- Marko -------------------
 Implementirana nova klasa Accounts kako bi mogli dodavati nove naloge a ne nove korisnike pri kreiranju naloga.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

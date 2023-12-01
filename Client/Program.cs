@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceModel;
@@ -6,17 +7,13 @@ using Common;
 using Common.Manager;
 using Common.Models;
 
+
 namespace Client
 {
     class Program
     {
         static void Main(string[] args)
         {     
-            if(!Database.UsersDB.ContainsKey(WindowsIdentity.GetCurrent().Name))
-            {
-                Database.UsersDB.Add(WindowsIdentity.GetCurrent().Name, new User(WindowsIdentity.GetCurrent().Name));
-            }
-
             while (true)
             {
                 int operacija = Meni();
@@ -31,7 +28,7 @@ namespace Client
             }
         }
 
-
+        
         public static int Meni()
         {
             Console.WriteLine("Izaberite zahtev: ");
@@ -106,7 +103,10 @@ namespace Client
 
             using (ClientWin proxy = new ClientWin(binding, address))
             {
-                Console.WriteLine("Windows Authentication communication is active");    
+                Console.WriteLine("Windows Authentication communication is active");
+                // Ucitavanje korisnika i naloga u in memory bazu
+                ReadAccounts(proxy);
+                ReadUsers(proxy);
                 try
                 {
                     switch (broj)
@@ -124,8 +124,23 @@ namespace Client
                             break;
                         case 2:
                             break;
+                        case 3:
 
+                            break;
                         case 4:
+                            if (IMDatabase.AllUserAccountsDB.Values.Count == 0)
+                                Console.WriteLine("Nema nijednog naloga u bazi podataka");
+                            Console.Write("Unesite broj naloga: ");
+                            string brojNaloga = Console.ReadLine();
+                            string pin = ResetPin(brojNaloga);
+                            if (proxy.ResetujPinKod(pin, brojNaloga))
+                            {
+                                Console.WriteLine("Uspesna promena pin koda!");
+                            }
+                            else
+                            {
+                                Console.WriteLine("Greska! Pin kod nije promenjen!");
+                            }
                             break;
 
                         case 5:
@@ -138,6 +153,7 @@ namespace Client
                 catch (Exception e)
                 {
                     Console.WriteLine(e.Message + "\n" + e.StackTrace);
+                    Console.ReadKey();
                 }
             }
         }
@@ -176,7 +192,6 @@ namespace Client
         }
         public static Account KreirajNalog()
         {
-            //string username = WindowsIdentity.GetCurrent().Name;
             Console.Write("Unesite broj naloga: ");
             string broj = Console.ReadLine();
             Console.Write("Unesite PIN: ");
@@ -195,7 +210,66 @@ namespace Client
             }
         }
 
+        public static string ResetPin(string brojNaloga)
+        {
+            if(IMDatabase.AllUserAccountsDB.ContainsKey(brojNaloga.Trim()))
+            {
+                Console.Write("Unesite stari Pin: ");
+                string stariPin = ReadPassword();
+                if (IMDatabase.AllUserAccountsDB[brojNaloga].Pin.Equals(stariPin))
+                {
+                    Console.Write("Unesite novi Pin: ");
+                    string noviPin = ReadPassword();
+                    Console.Write("Potvrdite novi Pin: ");
+                    string noviPinPotvrda = ReadPassword();
+                    if (noviPin.Equals(noviPinPotvrda))
+                    {
+                        Console.WriteLine("Pin kod je uspesno promenjen!");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Greska! Pin kodovi se ne poklapaju!");
+                        return null;
+                    }
+
+                    return noviPin;
+                }
+                else
+                {
+                    Console.WriteLine("Pogresan pin kod ili broj naloga. Pokusajte ponovo!");
+                    return null;
+                }
+            }
+            else
+            {
+                Console.WriteLine("Greska! Uneti broj naloga ne postoji!");
+                return null;
+            }
+        }
 
 
+        public static void ReadAccounts(ClientWin proxy)
+        {
+            Dictionary<string, Account> AllUsersDict = proxy.ReadDict();
+            foreach (Account acc in AllUsersDict.Values)
+            {
+                if (!IMDatabase.AllUserAccountsDB.ContainsKey(acc.BrojRacuna))
+                {
+                    IMDatabase.AllUserAccountsDB.Add(acc.BrojRacuna, acc);
+                }
+            }
+        }
+
+        public static void ReadUsers(ClientWin proxy)
+        {
+            Dictionary<string, User> AllUsersDict = proxy.ReadDictUsers();
+            foreach (User u in AllUsersDict.Values)
+            {
+                if (!IMDatabase.UsersDB.ContainsKey(u.Username))
+                {
+                    IMDatabase.UsersDB.Add(u.Username, u);
+                }
+            }
+        }
     }
 }

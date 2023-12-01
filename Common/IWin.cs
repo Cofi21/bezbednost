@@ -22,5 +22,13 @@ namespace Common
         [OperationContract]
         bool PovuciSertifikat();
 
+        [OperationContract]
+        bool ResetujPinKod(string pin, string brojNaloga);
+
+        [OperationContract]
+        Dictionary<string, Account> ReadDict();
+
+        [OperationContract]
+        Dictionary<string, User> ReadDictUsers();
     }
 }

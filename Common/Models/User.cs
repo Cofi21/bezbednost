@@ -11,6 +11,7 @@ namespace Common.Models
     public class User
     {
         private string username;
+        [DataMember]
         public Dictionary<string, Account> UserAccounts { get; set; }
 
 

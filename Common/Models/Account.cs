@@ -13,7 +13,8 @@ namespace Common.Models
         private string brojRacuna;
         private double stanje;
         private string pin;
-        private MasterCard masterCard;
+        [DataMember]
+        public List<MasterCard> MasterCards { get; set; }
 
         [DataMember]
         public string BrojRacuna { get => brojRacuna; set => brojRacuna = value; }
@@ -24,12 +25,10 @@ namespace Common.Models
         [DataMember]
         public string Pin { get => pin; set => pin = value; }
 
-        [DataMember]
-        public MasterCard MasterCardProp { get => masterCard; set => masterCard = value; }
-
         public Account() 
         {
             Stanje = 0;
+            MasterCards = new List<MasterCard>();
         }
 
         public Account(string brojRacuna, string pin)
@@ -37,6 +36,7 @@ namespace Common.Models
             BrojRacuna = brojRacuna;
             Stanje = 0;
             Pin = pin;
+            MasterCards = new List<MasterCard>();
         }
 
         public override bool Equals(object obj)
@@ -56,6 +56,11 @@ namespace Common.Models
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(BrojRacuna);
             hashCode = hashCode * -1521134295 + Stanje.GetHashCode();
             return hashCode;
+        }
+
+        public override string ToString()
+        {
+            return "Broj racuna: " + BrojRacuna + "\n" + "Stanje: " + Stanje;
         }
     }
 }
