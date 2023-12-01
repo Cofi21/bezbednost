@@ -14,25 +14,25 @@ namespace Client
     class Program
     {
         // TEST METODE ZA 3DES ALGORITAM
-        static void Test_3DES_Encrypt(string inputFile, string outputFile, string secretKey, CipherMode mode)
+        static void Test_3DES_Encrypt(byte[] message, string secretKey, CipherMode mode)
         {
             try
             {
-                TripleDES_Symm_Algorithm.EncryptFile(inputFile, outputFile, secretKey, mode);
-                Console.WriteLine("The file on location {0} is successfully decrypted.", inputFile);
+                TripleDES_Symm_Algorithm.EncryptMessage(message, secretKey, mode);
+                Console.WriteLine("Message is successfully encrypted.");
             }
             catch (Exception e)
             {
-                Console.WriteLine("Decryption failed. Reason: {0}", e.Message);
+                Console.WriteLine("Encryption failed. Reason: {0}", e.Message);
             }
         }
 
-        static void Test_3DES_Decrypt(string inputFile, string outputFile, string secretKey, CipherMode mode)
+        static void Test_3DES_Decrypt(byte[] message, string secretKey, CipherMode mode)
         {
             try
             {
-                TripleDES_Symm_Algorithm.DecryptFile(inputFile, outputFile, secretKey, mode);
-                Console.WriteLine("The file on location {0} is successfully decrypted.", inputFile);
+                TripleDES_Symm_Algorithm.DecryptMessage(message, secretKey, mode);
+                Console.WriteLine("Message is successfully decrypted.");
             }
             catch (Exception e)
             {
