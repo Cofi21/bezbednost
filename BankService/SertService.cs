@@ -34,7 +34,6 @@ namespace BankService
 
         public bool IzvrsiTransakciju(int opcija, string brojRacuna, double svota)
         {
-            string name = WindowsIdentity.GetCurrent().Name;
             if (opcija == 1)
             {
                 if (IMDatabase.AllUserAccountsDB.ContainsKey(brojRacuna))

@@ -22,7 +22,7 @@ namespace BankService
         {
             try
             {
-                TripleDES_Symm_Algorithm.EncryptFile(inputFile, outputFile, secretKey, mode);
+                //TripleDES_Symm_Algorithm.EncryptFile(inputFile, outputFile, secretKey, mode);
                 Console.WriteLine("The file on location {0} is successfully decrypted.", inputFile);
             }
             catch (Exception e)
@@ -35,7 +35,7 @@ namespace BankService
         {
             try
             {
-                TripleDES_Symm_Algorithm.DecryptFile(inputFile, outputFile, secretKey, mode);
+                //TripleDES_Symm_Algorithm.DecryptFile(inputFile, outputFile, secretKey, mode);
                 Console.WriteLine("The file on location {0} is successfully decrypted.", inputFile);
             }
             catch (Exception e)

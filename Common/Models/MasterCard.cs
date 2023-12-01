@@ -23,5 +23,10 @@ namespace Common.Models
         public string SubjectName { get => subjectName; set => subjectName = value; }
         [DataMember]
         public string Pin { get => pin; set => pin = value; }
+
+        public override string ToString()
+        {
+            return "Subject name: " + SubjectName;
+        }
     }
 }
