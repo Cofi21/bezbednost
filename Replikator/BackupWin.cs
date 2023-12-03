@@ -7,7 +7,7 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BackupService
+namespace Replikator
 {
     public class BackupWin : ChannelFactory<IReplikator>, IReplikator, IDisposable
     {
@@ -35,6 +35,12 @@ namespace BackupService
 
             this.Close();
         }
+
+        public void Ispis()
+        {
+            factory.Ispis();
+        }
+
         public void Posalji(List<Account> studenti)
         {
             factory.Posalji(studenti);

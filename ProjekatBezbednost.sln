@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BackupService", "BackupService\BackupService.csproj", "{252AE224-98B3-45E4-B9A6-29476AE10A6C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Replikator", "Replikator\Replikator.csproj", "{317A5F54-0706-4D96-8688-0BB392AD474A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{252AE224-98B3-45E4-B9A6-29476AE10A6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{252AE224-98B3-45E4-B9A6-29476AE10A6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{252AE224-98B3-45E4-B9A6-29476AE10A6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{317A5F54-0706-4D96-8688-0BB392AD474A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{317A5F54-0706-4D96-8688-0BB392AD474A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{317A5F54-0706-4D96-8688-0BB392AD474A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{317A5F54-0706-4D96-8688-0BB392AD474A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

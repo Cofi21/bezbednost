@@ -13,6 +13,9 @@ namespace Common.Models
         private string brojRacuna;
         private double stanje;
         private string pin;
+        // dodato zbog replikacije
+        DateTime vremePoslednjeIzmene;
+
         [DataMember]
         public List<MasterCard> MasterCards { get; set; }
 
@@ -25,10 +28,14 @@ namespace Common.Models
         [DataMember]
         public string Pin { get => pin; set => pin = value; }
 
+        [DataMember]
+        public DateTime VremePoslednjeIzmene { get => vremePoslednjeIzmene; set => vremePoslednjeIzmene = value; }
+
         public Account() 
         {
             Stanje = 0;
             MasterCards = new List<MasterCard>();
+            VremePoslednjeIzmene = DateTime.Now;
         }
 
         public Account(string brojRacuna, string pin)
@@ -37,6 +44,7 @@ namespace Common.Models
             Stanje = 0;
             Pin = pin;
             MasterCards = new List<MasterCard>();
+            VremePoslednjeIzmene = DateTime.Now;
         }
 
         public override bool Equals(object obj)

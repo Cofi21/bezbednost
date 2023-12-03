@@ -13,32 +13,7 @@ namespace Client
 {
     class Program
     {
-        // TEST METODE ZA 3DES ALGORITAM
-        static void Test_3DES_Encrypt(byte[] message, string secretKey, CipherMode mode)
-        {
-            try
-            {
-                TripleDES_Symm_Algorithm.EncryptMessage(message, secretKey, mode);
-                Console.WriteLine("Message is successfully encrypted.");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Encryption failed. Reason: {0}", e.Message);
-            }
-        }
-
-        static void Test_3DES_Decrypt(byte[] message, string secretKey, CipherMode mode)
-        {
-            try
-            {
-                TripleDES_Symm_Algorithm.DecryptMessage(message, secretKey, mode);
-                Console.WriteLine("Message is successfully decrypted.");
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Decryption failed. Reason: {0}", e.Message);
-            }
-        }
+        
 
         static void Main(string[] args)
         {     
@@ -123,7 +98,7 @@ namespace Client
         static void AuthConnection(int broj)
         {
             NetTcpBinding binding = new NetTcpBinding();
-            string address = "net.tcp://localhost:4000/MainService";
+            string address = "net.tcp://localhost:4000/WinService";
 
             binding.Security.Mode = SecurityMode.Transport;
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
@@ -297,6 +272,33 @@ namespace Client
                 {
                     IMDatabase.UsersDB.Add(u.Username, u);
                 }
+            }
+        }
+
+        // TEST METODE ZA 3DES ALGORITAM
+        static void Test_3DES_Encrypt(byte[] message, string secretKey, CipherMode mode)
+        {
+            try
+            {
+                TripleDES_Symm_Algorithm.EncryptMessage(message, secretKey, mode);
+                Console.WriteLine("Message is successfully encrypted.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Encryption failed. Reason: {0}", e.Message);
+            }
+        }
+
+        static void Test_3DES_Decrypt(byte[] message, string secretKey, CipherMode mode)
+        {
+            try
+            {
+                TripleDES_Symm_Algorithm.DecryptMessage(message, secretKey, mode);
+                Console.WriteLine("Message is successfully decrypted.");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Decryption failed. Reason: {0}", e.Message);
             }
         }
     }

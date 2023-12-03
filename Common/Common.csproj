@@ -47,6 +47,7 @@
     <Compile Include="3DES_Symm_Algorithm.cs" />
     <Compile Include="ICert.cs" />
     <Compile Include="IMDatabase.cs" />
+    <Compile Include="IReplikator.cs" />
     <Compile Include="IWin.cs" />
     <Compile Include="Manager\CertManager.cs" />
     <Compile Include="Manager\Formatter.cs" />
