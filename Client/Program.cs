@@ -25,7 +25,7 @@ namespace Client
             while (true)
             {
                 int operacija = Meni();
-                if(operacija == 3)
+                if(operacija == 3 || operacija == 4)
                 {
                     CertConnection(operacija);
                 }
@@ -65,41 +65,57 @@ namespace Client
             string signCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name) + "_ds";
 
             X509Certificate2 certificateSign = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, signCertCN);
-
             using (ClientCert proxy = new ClientCert(binding, address))
             {
-                proxy.TestCommunication();
                 try
                 {
-                    Console.WriteLine("Certificate communication is active");
-                    Console.WriteLine("Izaberite akciju: ");
-                    Console.WriteLine("\t1 - Uplata novca");
-                    Console.WriteLine("\t2 - Podizanje novca ");
-                    Console.WriteLine("\t0 - Izlaz");
-                    Console.Write("Unesite Vas izbor: ");
-                    int izbor = Int32.Parse(Console.ReadLine());
+                    if(operacija == 3)
+                    { 
+                        Console.WriteLine("Certificate communication is active");
+                        Console.WriteLine("Izaberite akciju: ");
+                        Console.WriteLine("\t1 - Uplata novca");
+                        Console.WriteLine("\t2 - Podizanje novca ");
+                        Console.WriteLine("\t0 - Izlaz");
+                        Console.Write("Unesite Vas izbor: ");
+                        int izbor = Int32.Parse(Console.ReadLine());
 
-                    if (izbor == 0) return;
-                    Console.Write("Unesite broj racuna na kom ce se izvrsiti transakcija: ");
-                    string brojRacuna = Console.ReadLine();
-                    double svotaNovca = 0;
-                    byte[] signature = DigitalSignature.Create(izbor.ToString(), Manager.HashAlgorithm.SHA1, certificateSign);
+                        if (izbor == 0) return;
+                        Console.Write("Unesite broj racuna na kom ce se izvrsiti transakcija: ");
+                        string brojRacuna = Console.ReadLine();
+                        double svotaNovca = 0;
+                        byte[] signature = DigitalSignature.Create(izbor.ToString(), Manager.HashAlgorithm.SHA1, certificateSign);
 
-                    if (izbor == 1)
+                        if (izbor == 1)
+                        {
+                            Console.Write("Unesite koliko novca zelite da uplatite: ");
+                            svotaNovca = Double.Parse(Console.ReadLine());
+                            Console.WriteLine("PRE");
+                            if (proxy.IzvrsiTransakciju(izbor, brojRacuna, svotaNovca, signature)) Console.WriteLine($"Uspesno ste uplatili {svotaNovca} dinara.");
+                            else Console.WriteLine("Transakcija nije moguca! Uneli ste nepostojeci broj racuna!");
+                            Console.WriteLine("POSLE");
+                        }
+                        else if (izbor == 2)
+                        {
+                            Console.Write("Unesite koliko novca zelite da podignete: ");
+                            svotaNovca = Double.Parse(Console.ReadLine());
+                            if (proxy.IzvrsiTransakciju(izbor, brojRacuna, svotaNovca, signature)) Console.WriteLine($"Uspesno ste podigli {svotaNovca} dinara.");
+                            else Console.WriteLine("Transakcija nije moguca! Uneli ste nepostojeci broj racuna ili nemate dovoljno sredstava na racunu!");
+                        }
+
+                    }else if(operacija == 4)
                     {
-                        Console.Write("Unesite koliko novca zelite da uplatite: ");
-                        svotaNovca = Double.Parse(Console.ReadLine());
-                        Console.WriteLine("PRE");
-                        if (proxy.IzvrsiTransakciju(izbor, brojRacuna, svotaNovca, signature)) Console.WriteLine($"Uspesno ste uplatili {svotaNovca} dinara.");
-                        else Console.WriteLine("Transakcija nije moguca! Uneli ste nepostojeci broj racuna!");
-                        Console.WriteLine("POSLE");
-                    }
-                    else if (izbor == 2)
-                    {
-                        Console.Write("Unesite koliko novca zelite da podignete: ");
-                        svotaNovca = Double.Parse(Console.ReadLine());
-                        if (proxy.IzvrsiTransakciju(izbor, brojRacuna, svotaNovca, signature)) Console.WriteLine($"Uspesno ste podigli {svotaNovca} dinara.");
-                        else Console.WriteLine("Transakcija nije moguca! Uneli ste nepostojeci broj racuna ili nemate dovoljno sredstava na racunu!");
+                        Console.Write("Unesite broj naloga: ");
+                        string brojNaloga = Console.ReadLine();
+                        string pin = ResetPin(brojNaloga);
+                        byte[] signature = DigitalSignature.Create(brojNaloga, Manager.HashAlgorithm.SHA1, certificateSign);
+                        if (proxy.ResetujPinKod(pin, brojNaloga, signature))
+                        {
+                            Console.WriteLine("Uspesna promena pin koda!");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Greska! Pin kod nije promenjen!");
+                        }
                     }
                 }
                 catch (Exception e)
@@ -118,6 +134,10 @@ namespace Client
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
             binding.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
 
+            // digitalni potpisi
+            string signCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name) + "_ds";
+            X509Certificate2 certificateSign = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, signCertCN);
+
             using (ClientWin proxy = new ClientWin(binding, address))
             {
                 Console.WriteLine("Windows Authentication communication is active");
@@ -130,8 +150,9 @@ namespace Client
                     {
                         case 1:
                             Account acc = KreirajNalog();
-                            
-                            if (proxy.KreirajNalog(acc))
+                            byte[] signature = DigitalSignature.Create(acc.BrojRacuna, Manager.HashAlgorithm.SHA1, certificateSign);
+
+                            if (proxy.KreirajNalog(acc, signature))
                             {
                                 Console.WriteLine("Cestitamo! Uspesno ste kreirali nalog!");
                             }
@@ -141,26 +162,6 @@ namespace Client
                             }
                             break;
                         case 2:
-                            break;
-                        case 3:
-
-                            break;
-                        case 4:
-                            Console.Write("Unesite broj naloga: ");
-                            string brojNaloga = Console.ReadLine();
-                            string pin = ResetPin(brojNaloga);
-                         //   EncryptToBase64(brojNaloga, "1234", CipherMode.ECB);
-                        //    Console.WriteLine("kriptovano: " + brojNaloga);
-                        // /   DecryptFromBase64(brojNaloga, "1234", CipherMode.ECB);
-                         //   Console.WriteLine("Dekriptovano: " + brojNaloga);
-                            if (proxy.ResetujPinKod(pin, brojNaloga))
-                            {
-                                Console.WriteLine("Uspesna promena pin koda!");
-                            }
-                            else
-                            {
-                                Console.WriteLine("Greska! Pin kod nije promenjen!");
-                            }
                             break;
 
                         case 5:
@@ -232,8 +233,8 @@ namespace Client
 
         public static string ResetPin(string brojNaloga)
         {
-            if(IMDatabase.AllUserAccountsDB.ContainsKey(brojNaloga.Trim()))
-            {
+          //  if(IMDatabase.AllUserAccountsDB.ContainsKey(brojNaloga.Trim()))
+       //     {
                 Console.Write("Unesite stari Pin: ");
                 string stariPin = ReadPassword();
                 if (IMDatabase.AllUserAccountsDB[brojNaloga].Pin.Equals(stariPin))
@@ -259,14 +260,13 @@ namespace Client
                     Console.WriteLine("Pogresan pin kod ili broj naloga. Pokusajte ponovo!");
                     return null;
                 }
-            }
-            else
-            {
-                Console.WriteLine("Greska! Uneti broj naloga ne postoji!");
-                return null;
-            }
+          //  }
+        //    else
+         //   {
+          //      Console.WriteLine("Greska! Uneti broj naloga ne postoji!");
+          //      return null;
+         //   }
         }
-
 
         public static void ReadAccounts(ClientWin proxy)
         {
@@ -280,6 +280,7 @@ namespace Client
             }
         }
 
+        /*
         public static void ReadUsers(ClientWin proxy)
         {
             Dictionary<string, User> AllUsersDict = proxy.ReadDictUsers();
@@ -291,7 +292,6 @@ namespace Client
                 }
             }
         }
-        /*
                 public static string EncryptToBase64(string data, string secretKey, CipherMode mode)
                 {
                     try

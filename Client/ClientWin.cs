@@ -42,9 +42,9 @@ namespace Client
 
 
 
-        public bool KreirajNalog(Account acc)
+        public bool KreirajNalog(Account acc, byte[] signature)
         {
-            return factory.KreirajNalog(acc);
+            return factory.KreirajNalog(acc, signature);
         }
 
         public void TestCommunication()
@@ -63,11 +63,6 @@ namespace Client
         public bool PovuciSertifikat()
         {
             return factory.PovuciSertifikat();
-        }
-
-        public bool ResetujPinKod(string pin, string brojNaloga)
-        {
-            return factory.ResetujPinKod(pin, brojNaloga);
         }
 
         public Dictionary<string, Account> ReadDict()

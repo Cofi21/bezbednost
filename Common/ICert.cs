@@ -14,7 +14,7 @@ namespace Common
         void TestCommunication();
 
         [OperationContract]
-        bool ResetujPinKod();
+        bool ResetujPinKod(string pin, string brojNaloga, byte[] signature);
 
 
         [OperationContract]

@@ -16,14 +16,12 @@ namespace Common
 
 
         [OperationContract]
-        bool KreirajNalog(Account acc);
+        bool KreirajNalog(Account acc, byte[] signature);
 
 
         [OperationContract]
         bool PovuciSertifikat();
 
-        [OperationContract]
-        bool ResetujPinKod(string pin, string brojNaloga);
 
         [OperationContract]
         Dictionary<string, Account> ReadDict();

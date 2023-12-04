@@ -62,9 +62,9 @@ namespace Client
         }
 
 
-        public bool ResetujPinKod()
+        public bool ResetujPinKod(string pin, string brojNaloga, byte[] signature)
         {
-            return factory.ResetujPinKod();
+            return factory.ResetujPinKod(pin, brojNaloga, signature);
         }
 
         public bool IzvrsiTransakciju(int opcija, string brojRacuna, double svota, byte[] signature)
