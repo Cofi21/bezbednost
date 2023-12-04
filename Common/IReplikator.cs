@@ -17,7 +17,5 @@ namespace Common
         [OperationContract]
         List<Account> Preuzmi(DateTime vremeReplikacije);
 
-        [OperationContract]
-        void Ispis();
     }
 }

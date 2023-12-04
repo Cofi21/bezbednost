@@ -1,5 +1,6 @@
 ﻿using Common;
 using Common.Models;
+using SymmetricAlgorithms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,7 +35,9 @@ namespace BankService
                     return false;
                 }
                 else
-                {
+                { 
+                 
+                  
                     MasterCard mc = new MasterCard(name, acc.Pin);
                     acc.MasterCards.Add(mc);
 
@@ -42,7 +45,7 @@ namespace BankService
                     IMDatabase.AllUserAccountsDB.Add(acc.BrojRacuna, acc);
 
                     //Ispis radi provere
-                    foreach(Account ac in IMDatabase.AllUserAccountsDB.Values)
+                    foreach (Account ac in IMDatabase.AllUserAccountsDB.Values)
                     {
                         Console.WriteLine(ac.ToString());
                     }

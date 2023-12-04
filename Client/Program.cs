@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceModel;
+using System.Text;
 using Common;
 using Common.Manager;
 using Common.Models;
@@ -107,7 +108,7 @@ namespace Client
             using (ClientWin proxy = new ClientWin(binding, address))
             {
                 Console.WriteLine("Windows Authentication communication is active");
-                // Ucitavanje korisnika i naloga u in memory bazu
+                // Ucitavanje korisnika i naloga u inMemory bazu
                 ReadAccounts(proxy);
                 ReadUsers(proxy);
                 try
@@ -131,11 +132,13 @@ namespace Client
 
                             break;
                         case 4:
-                            if (IMDatabase.AllUserAccountsDB.Values.Count == 0)
-                                Console.WriteLine("Nema nijednog naloga u bazi podataka");
                             Console.Write("Unesite broj naloga: ");
                             string brojNaloga = Console.ReadLine();
                             string pin = ResetPin(brojNaloga);
+                            EncryptToBase64(brojNaloga, "1234", CipherMode.ECB);
+                            Console.WriteLine("kriptovano: " + brojNaloga);
+                            DecryptFromBase64(brojNaloga, "1234", CipherMode.ECB);
+                            Console.WriteLine("Dekriptovano: " + brojNaloga);
                             if (proxy.ResetujPinKod(pin, brojNaloga))
                             {
                                 Console.WriteLine("Uspesna promena pin koda!");
@@ -275,30 +278,39 @@ namespace Client
             }
         }
 
-        // TEST METODE ZA 3DES ALGORITAM
-        static void Test_3DES_Encrypt(byte[] message, string secretKey, CipherMode mode)
+        public static string EncryptToBase64(string data, string secretKey, CipherMode mode)
         {
             try
             {
-                TripleDES_Symm_Algorithm.EncryptMessage(message, secretKey, mode);
-                Console.WriteLine("Message is successfully encrypted.");
+                byte[] messageBytes = Encoding.UTF8.GetBytes(data);
+
+                byte[] encryptedData = TripleDES_Symm_Algorithm.EncryptMessage(messageBytes, secretKey, mode);
+
+                string encryptedString = Convert.ToBase64String(encryptedData);
+                return encryptedString;
             }
             catch (Exception e)
             {
                 Console.WriteLine("Encryption failed. Reason: {0}", e.Message);
+                return null; 
             }
         }
 
-        static void Test_3DES_Decrypt(byte[] message, string secretKey, CipherMode mode)
+        public static string DecryptFromBase64(string encryptedString, string secretKey, CipherMode mode)
         {
             try
             {
-                TripleDES_Symm_Algorithm.DecryptMessage(message, secretKey, mode);
-                Console.WriteLine("Message is successfully decrypted.");
+                byte[] encryptedData = Convert.FromBase64String(encryptedString);
+
+                byte[] decryptedData = TripleDES_Symm_Algorithm.DecryptMessage(encryptedData, secretKey, mode);
+
+                string decryptedString = Encoding.UTF8.GetString(decryptedData);
+                return decryptedString;
             }
             catch (Exception e)
             {
                 Console.WriteLine("Decryption failed. Reason: {0}", e.Message);
+                return null; 
             }
         }
     }

@@ -24,21 +24,11 @@ namespace BankService
 
             foreach(Account acc in IMDatabase.AllUserAccountsDB.Values)
             {
-                if(acc.VremePoslednjeIzmene >= vremeReplikacije)
-                {
                     accounts.Add(acc);
-                }
             }
 
             return accounts;
         }
 
-        public void Ispis()
-        {
-            foreach(Account acc in IMDatabase.AllUserAccountsDB.Values)
-            {
-                Console.WriteLine(acc + "\n");
-            }
-        }
     }
 }

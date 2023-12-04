@@ -35,18 +35,20 @@ namespace Replikator
                     {
                         odrediste.Posalji(IMDatabase.AllUserAccountsDB.Values.ToList());
                         time = DateTime.Now;
-                        isFirstTime = false;
+                        isFirstTime = false; 
                     }
                     else
                     {
                         List<Account> accounts = izvor.Preuzmi(time);
                         time = DateTime.Now;
                         odrediste.Posalji(accounts);
-                        foreach (var acc in accounts)
+                        /*foreach (var acc in accounts)
                         {
                             Console.WriteLine($"BrojRacuna: {acc.BrojRacuna}, Stanje: {acc.Stanje}, Vreme poslednje izmene: {acc.VremePoslednjeIzmene}");
                         }
-                        Console.WriteLine("----------------------------------------");
+                        Console.WriteLine("----------------------------------------");*/
+
+                        Console.WriteLine("Repliciranje...");
                     }
 
                     Thread.Sleep(4000);

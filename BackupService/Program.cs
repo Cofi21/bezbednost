@@ -34,8 +34,14 @@ namespace BackupService
 
                 while (true)
                 {
-                    // Hvatanje pristiglih naloga iz Replikator servisa
-                    replicator.Ispis();
+                    // Prihvatanje pristiglih naloga iz Replikator servisa
+                    List<Account> accounts = replicator.Preuzmi(DateTime.Now);
+                    
+                    foreach(Account acc in accounts)
+                    {
+                        Console.WriteLine(acc + "\n");
+                    }
+                    Console.WriteLine("----------------------------");
 
                     Thread.Sleep(4000);
                 }

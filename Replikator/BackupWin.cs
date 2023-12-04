@@ -36,11 +36,6 @@ namespace Replikator
             this.Close();
         }
 
-        public void Ispis()
-        {
-            factory.Ispis();
-        }
-
         public void Posalji(List<Account> studenti)
         {
             factory.Posalji(studenti);
