@@ -21,7 +21,7 @@ namespace Replikator
                 try
                 {
                     NetTcpBinding binding = new NetTcpBinding();
-                    string address1 = "net.tcp://localhost:4001/Replikator";
+                    string address1 = "net.tcp://localhost:4002/Replikator";
                     string address2 = "net.tcp://localhost:8000/Replikator";
 
                     binding.Security.Mode = SecurityMode.Transport;

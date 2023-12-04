@@ -10,13 +10,6 @@ namespace Manager
     public enum HashAlgorithm { SHA1, SHA256 }
     public class DigitalSignature
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="message"> a message/text to be digitally signed </param>
-        /// <param name="hashAlgorithm"> an arbitrary hash algorithm </param>
-        /// <param name="certificate"> certificate of a user who creates a signature </param>
-        /// <returns> byte array representing a digital signature for the given message </returns>
         public static byte[] Create(string message, HashAlgorithm hashAlgorithm, X509Certificate2 certificate)
         {
             /// Looks for the certificate's private key to sign a message
@@ -65,6 +58,7 @@ namespace Manager
                 SHA256Managed sha256 = new SHA256Managed();
                 hash = sha256.ComputeHash(data);
             }
+
 
             /// Use RSACryptoServiceProvider support to compare two - hash value from signature and newly created hash value
             return csp.VerifyHash(hash, CryptoConfig.MapNameToOID(hashAlgorithm.ToString()), signature);

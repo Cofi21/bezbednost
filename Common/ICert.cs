@@ -18,6 +18,6 @@ namespace Common
 
 
         [OperationContract]
-        bool IzvrsiTransakciju(int opcija, string brojRacuna, double svota);
+        bool IzvrsiTransakciju(int opcija, string brojRacuna, double svota, byte[] signature);
     }
 }

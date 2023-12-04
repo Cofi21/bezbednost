@@ -26,7 +26,7 @@ namespace BankService
             {
                 IMDatabase.UsersDB.Add(name, new User(name));
             }
-            Console.WriteLine("Nalog kreiran");
+            Console.WriteLine("Dodat user u bazu");
             try
             {
                 if (IMDatabase.AllUserAccountsDB.ContainsKey(acc.BrojRacuna))

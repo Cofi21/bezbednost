@@ -18,7 +18,6 @@ namespace BankService
     class Program
     {
         
-
         static void Main(string[] args)
         {
             Console.WriteLine("Server je pokrenut od strane " + WindowsIdentity.GetCurrent().Name);
@@ -34,7 +33,7 @@ namespace BankService
             #endregion
 
             #region Certificates
-            string srvCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name);
+            string srvCertCN = "server";
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
             string address = "net.tcp://localhost:4001/SertService";
@@ -50,7 +49,7 @@ namespace BankService
             bindingWinRep.Security.Mode = SecurityMode.Transport;
             bindingWinRep.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
             bindingWinRep.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
-            string addressWinRep = "net.tcp://localhost:4001/Replikator";
+            string addressWinRep = "net.tcp://localhost:4002/Replikator";
             ServiceHost hostWinRep = new ServiceHost(typeof(Replikator));
             hostWinRep.AddServiceEndpoint(typeof(IReplikator), bindingWinRep, addressWinRep);
             #endregion
@@ -77,8 +76,8 @@ namespace BankService
             {
                 hostCert.Close();
                 hostWin.Close();
+                hostWinRep.Close();
             }
         }
-
     }
 }

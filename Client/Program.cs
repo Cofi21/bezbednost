@@ -8,7 +8,10 @@ using System.Text;
 using Common;
 using Common.Manager;
 using Common.Models;
+using Manager;
 using SymmetricAlgorithms;
+using System.Diagnostics;
+
 
 namespace Client
 {
@@ -17,7 +20,8 @@ namespace Client
         
 
         static void Main(string[] args)
-        {     
+        {
+            Console.WriteLine($"Logovani korisnik { WindowsIdentity.GetCurrent().Name}");
             while (true)
             {
                 int operacija = Meni();
@@ -32,7 +36,7 @@ namespace Client
             }
         }
 
-        
+
         public static int Meni()
         {
             Console.WriteLine("Izaberite zahtev: ");
@@ -57,8 +61,14 @@ namespace Client
             X509Certificate2 srvCert = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, srvCertCN);
             EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:4001/SertService"), new X509CertificateEndpointIdentity(srvCert));
 
+            // digitalni potpisi
+            string signCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name) + "_ds";
+
+            X509Certificate2 certificateSign = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, signCertCN);
+
             using (ClientCert proxy = new ClientCert(binding, address))
             {
+                proxy.TestCommunication();
                 try
                 {
                     Console.WriteLine("Certificate communication is active");
@@ -73,25 +83,28 @@ namespace Client
                     Console.Write("Unesite broj racuna na kom ce se izvrsiti transakcija: ");
                     string brojRacuna = Console.ReadLine();
                     double svotaNovca = 0;
+                    byte[] signature = DigitalSignature.Create(izbor.ToString(), Manager.HashAlgorithm.SHA1, certificateSign);
 
                     if (izbor == 1)
                     {
                         Console.Write("Unesite koliko novca zelite da uplatite: ");
                         svotaNovca = Double.Parse(Console.ReadLine());
-                        if (proxy.IzvrsiTransakciju(izbor, brojRacuna, svotaNovca)) Console.WriteLine($"Uspesno ste uplatili {svotaNovca} dinara.");
+                        Console.WriteLine("PRE");
+                        if (proxy.IzvrsiTransakciju(izbor, brojRacuna, svotaNovca, signature)) Console.WriteLine($"Uspesno ste uplatili {svotaNovca} dinara.");
                         else Console.WriteLine("Transakcija nije moguca! Uneli ste nepostojeci broj racuna!");
+                        Console.WriteLine("POSLE");
                     }
                     else if (izbor == 2)
                     {
                         Console.Write("Unesite koliko novca zelite da podignete: ");
                         svotaNovca = Double.Parse(Console.ReadLine());
-                        if (proxy.IzvrsiTransakciju(izbor, brojRacuna, svotaNovca)) Console.WriteLine($"Uspesno ste podigli {svotaNovca} dinara.");
+                        if (proxy.IzvrsiTransakciju(izbor, brojRacuna, svotaNovca, signature)) Console.WriteLine($"Uspesno ste podigli {svotaNovca} dinara.");
                         else Console.WriteLine("Transakcija nije moguca! Uneli ste nepostojeci broj racuna ili nemate dovoljno sredstava na racunu!");
                     }
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.Message );
                 }
             }
         }
@@ -117,6 +130,7 @@ namespace Client
                     {
                         case 1:
                             Account acc = KreirajNalog();
+                            
                             if (proxy.KreirajNalog(acc))
                             {
                                 Console.WriteLine("Cestitamo! Uspesno ste kreirali nalog!");
@@ -135,10 +149,10 @@ namespace Client
                             Console.Write("Unesite broj naloga: ");
                             string brojNaloga = Console.ReadLine();
                             string pin = ResetPin(brojNaloga);
-                            EncryptToBase64(brojNaloga, "1234", CipherMode.ECB);
-                            Console.WriteLine("kriptovano: " + brojNaloga);
-                            DecryptFromBase64(brojNaloga, "1234", CipherMode.ECB);
-                            Console.WriteLine("Dekriptovano: " + brojNaloga);
+                         //   EncryptToBase64(brojNaloga, "1234", CipherMode.ECB);
+                        //    Console.WriteLine("kriptovano: " + brojNaloga);
+                        // /   DecryptFromBase64(brojNaloga, "1234", CipherMode.ECB);
+                         //   Console.WriteLine("Dekriptovano: " + brojNaloga);
                             if (proxy.ResetujPinKod(pin, brojNaloga))
                             {
                                 Console.WriteLine("Uspesna promena pin koda!");
@@ -277,41 +291,44 @@ namespace Client
                 }
             }
         }
+        /*
+                public static string EncryptToBase64(string data, string secretKey, CipherMode mode)
+                {
+                    try
+                    {
+                        byte[] messageBytes = Encoding.UTF8.GetBytes(data);
 
-        public static string EncryptToBase64(string data, string secretKey, CipherMode mode)
-        {
-            try
-            {
-                byte[] messageBytes = Encoding.UTF8.GetBytes(data);
+                        byte[] encryptedData = TripleDES_Symm_Algorithm.EncryptMessage(messageBytes, secretKey, mode);
 
-                byte[] encryptedData = TripleDES_Symm_Algorithm.EncryptMessage(messageBytes, secretKey, mode);
+                        string encryptedString = Convert.ToBase64String(encryptedData);
+                        return encryptedString;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Encryption failed. Reason: {0}", e.Message);
+                        return null; 
+                    }
+                }
 
-                string encryptedString = Convert.ToBase64String(encryptedData);
-                return encryptedString;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Encryption failed. Reason: {0}", e.Message);
-                return null; 
-            }
-        }
+                public static string DecryptFromBase64(string encryptedString, string secretKey, CipherMode mode)
+                {
+                    try
+                    {
+                        byte[] encryptedData = Convert.FromBase64String(encryptedString);
 
-        public static string DecryptFromBase64(string encryptedString, string secretKey, CipherMode mode)
-        {
-            try
-            {
-                byte[] encryptedData = Convert.FromBase64String(encryptedString);
+                        byte[] decryptedData = TripleDES_Symm_Algorithm.DecryptMessage(encryptedData, secretKey, mode);
 
-                byte[] decryptedData = TripleDES_Symm_Algorithm.DecryptMessage(encryptedData, secretKey, mode);
+                        string decryptedString = Encoding.UTF8.GetString(decryptedData);
+                        return decryptedString;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("Decryption failed. Reason: {0}", e.Message);
+                        return null; 
+                    }
+                }*/
 
-                string decryptedString = Encoding.UTF8.GetString(decryptedData);
-                return decryptedString;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("Decryption failed. Reason: {0}", e.Message);
-                return null; 
-            }
-        }
+
+
     }
 }

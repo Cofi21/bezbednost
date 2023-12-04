@@ -67,9 +67,17 @@ namespace Client
             return factory.ResetujPinKod();
         }
 
-        public bool IzvrsiTransakciju(int opcija, string brojRacuna, double svota)
+        public bool IzvrsiTransakciju(int opcija, string brojRacuna, double svota, byte[] signature)
         {
-            return factory.IzvrsiTransakciju(opcija, brojRacuna, svota);
+            try
+            {
+
+                return factory.IzvrsiTransakciju(opcija, brojRacuna, svota, signature);
+            }catch(Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return false;
+            }
         }
 
     }
