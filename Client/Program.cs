@@ -11,7 +11,8 @@ using Common.Models;
 using Manager;
 using SymmetricAlgorithms;
 using System.Diagnostics;
-
+using System.IO;
+using System.Runtime.Serialization;
 
 namespace Client
 {
@@ -62,7 +63,7 @@ namespace Client
             EndpointAddress address = new EndpointAddress(new Uri("net.tcp://localhost:4001/SertService"), new X509CertificateEndpointIdentity(srvCert));
 
             // digitalni potpisi
-            string signCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name) + "_ds";
+            string signCertCN = Common.Manager.Formatter.ParseName(WindowsIdentity.GetCurrent().Name) + "_ds";
 
             X509Certificate2 certificateSign = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, signCertCN);
             using (ClientCert proxy = new ClientCert(binding, address))
@@ -130,12 +131,14 @@ namespace Client
             NetTcpBinding binding = new NetTcpBinding();
             string address = "net.tcp://localhost:4000/WinService";
 
+            string secretKey = "123456";
+
             binding.Security.Mode = SecurityMode.Transport;
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
             binding.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
 
             // digitalni potpisi
-            string signCertCN = Formatter.ParseName(WindowsIdentity.GetCurrent().Name) + "_ds";
+            string signCertCN = Common.Manager.Formatter.ParseName(WindowsIdentity.GetCurrent().Name) + "_ds";
             X509Certificate2 certificateSign = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, signCertCN);
 
             using (ClientWin proxy = new ClientWin(binding, address))
@@ -143,7 +146,7 @@ namespace Client
                 Console.WriteLine("Windows Authentication communication is active");
                 // Ucitavanje korisnika i naloga u inMemory bazu
                 ReadAccounts(proxy);
-                ReadUsers(proxy);
+                //ReadUsers(proxy);
                 try
                 {
                     switch (broj)
@@ -151,8 +154,8 @@ namespace Client
                         case 1:
                             Account acc = KreirajNalog();
                             byte[] signature = DigitalSignature.Create(acc.BrojRacuna, Manager.HashAlgorithm.SHA1, certificateSign);
-
-                            if (proxy.KreirajNalog(acc, signature))
+                            byte[] account = CreateEncryptedAccount(acc, secretKey);
+                            if (proxy.KreirajNalog(account, signature))
                             {
                                 Console.WriteLine("Cestitamo! Uspesno ste kreirali nalog!");
                             }
@@ -219,6 +222,8 @@ namespace Client
             string pin = ReadPassword();
             Console.Write("Potvrdite PIN: ");
             string pinPotvrda = ReadPassword();
+
+
 
             if (pin.Equals(pinPotvrda))
             {
@@ -292,43 +297,23 @@ namespace Client
                 }
             }
         }
-                public static string EncryptToBase64(string data, string secretKey, CipherMode mode)
-                {
-                    try
-                    {
-                        byte[] messageBytes = Encoding.UTF8.GetBytes(data);
+        */
 
-                        byte[] encryptedData = TripleDES_Symm_Algorithm.EncryptMessage(messageBytes, secretKey, mode);
+        public static byte[] SerializeAccount(Account account)
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                DataContractSerializer serializer = new DataContractSerializer(typeof(Account));
+                serializer.WriteObject(memoryStream, account);
+                return memoryStream.ToArray();
+            }
+        }
 
-                        string encryptedString = Convert.ToBase64String(encryptedData);
-                        return encryptedString;
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Encryption failed. Reason: {0}", e.Message);
-                        return null; 
-                    }
-                }
-
-                public static string DecryptFromBase64(string encryptedString, string secretKey, CipherMode mode)
-                {
-                    try
-                    {
-                        byte[] encryptedData = Convert.FromBase64String(encryptedString);
-
-                        byte[] decryptedData = TripleDES_Symm_Algorithm.DecryptMessage(encryptedData, secretKey, mode);
-
-                        string decryptedString = Encoding.UTF8.GetString(decryptedData);
-                        return decryptedString;
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("Decryption failed. Reason: {0}", e.Message);
-                        return null; 
-                    }
-                }*/
-
-
+        public static byte[] CreateEncryptedAccount(Account account, string secretKey)
+        {
+            byte[] serializedAccount = SerializeAccount(account);
+            return TripleDES_Symm_Algorithm.Encrypt(serializedAccount, secretKey);
+        }
 
     }
 }

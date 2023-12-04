@@ -10,50 +10,38 @@ namespace SymmetricAlgorithms
 {
     public class TripleDES_Symm_Algorithm
     {
-        public static byte[] EncryptMessage(byte[] message, string secretKey, CipherMode mode)
+        public static byte[] Encrypt(byte[] source, string key)
         {
-            TripleDESCryptoServiceProvider tripleDesCryptoProvider = new TripleDESCryptoServiceProvider
-            {
-                Key = ASCIIEncoding.ASCII.GetBytes(secretKey),
-                Mode = mode,
-                Padding = PaddingMode.PKCS7 // Padding mode for messages
-            };
+            TripleDESCryptoServiceProvider desCryptoProvider = new TripleDESCryptoServiceProvider();
+            MD5CryptoServiceProvider hashMD5Provider = new MD5CryptoServiceProvider();
 
-            ICryptoTransform tripleDesEncryptTransform = tripleDesCryptoProvider.CreateEncryptor();
+            byte[] byteHash;
+            byte[] byteBuff;
 
-            using (MemoryStream memoryStream = new MemoryStream())
-            {
-                using (CryptoStream cryptoStream = new CryptoStream(memoryStream, tripleDesEncryptTransform, CryptoStreamMode.Write))
-                {
-                    cryptoStream.Write(message, 0, message.Length);
-                    cryptoStream.FlushFinalBlock();
-                }
+            byteHash = hashMD5Provider.ComputeHash(Encoding.UTF8.GetBytes(key));
+            desCryptoProvider.Key = byteHash;
+            desCryptoProvider.Mode = CipherMode.ECB;
+            byteBuff = source;
 
-                return memoryStream.ToArray(); // Encrypted message
-            }
+            byte[] encoded =
+                desCryptoProvider.CreateEncryptor().TransformFinalBlock(byteBuff, 0, byteBuff.Length);
+            return encoded;
         }
-        public static byte[] DecryptMessage(byte[] encryptedMessage, string secretKey, CipherMode mode)
+        public static byte[] Decrypt(byte[] encodedText, string key)
         {
-            TripleDESCryptoServiceProvider tripleDesCryptoProvider = new TripleDESCryptoServiceProvider
-            {
-                Key = ASCIIEncoding.ASCII.GetBytes(secretKey),
-                Mode = mode,
-                Padding = PaddingMode.PKCS7
-            };
+            TripleDESCryptoServiceProvider desCryptoProvider = new TripleDESCryptoServiceProvider();
+            MD5CryptoServiceProvider hashMD5Provider = new MD5CryptoServiceProvider();
 
-            ICryptoTransform tripleDesDecryptTransform = tripleDesCryptoProvider.CreateDecryptor();
+            byte[] byteHash;
+            byte[] byteBuff;
 
-            using (MemoryStream memoryStream = new MemoryStream(encryptedMessage))
-            {
-                using (CryptoStream cryptoStream = new CryptoStream(memoryStream, tripleDesDecryptTransform, CryptoStreamMode.Read))
-                {
-                    using (MemoryStream decryptedStream = new MemoryStream())
-                    {
-                        cryptoStream.CopyTo(decryptedStream);
-                        return decryptedStream.ToArray(); // Decrypted message
-                    }
-                }
-            }
+            byteHash = hashMD5Provider.ComputeHash(Encoding.UTF8.GetBytes(key));
+            desCryptoProvider.Key = byteHash;
+            desCryptoProvider.Mode = CipherMode.ECB;
+            byteBuff = encodedText;
+
+            byte[] plaintext = desCryptoProvider.CreateDecryptor().TransformFinalBlock(byteBuff, 0, byteBuff.Length);
+            return plaintext;
         }
 
     }

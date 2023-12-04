@@ -42,9 +42,9 @@ namespace Client
 
 
 
-        public bool KreirajNalog(Account acc, byte[] signature)
+        public bool KreirajNalog(byte[] recievedData, byte[] signature)
         {
-            return factory.KreirajNalog(acc, signature);
+            return factory.KreirajNalog(recievedData, signature);
         }
 
         public void TestCommunication()

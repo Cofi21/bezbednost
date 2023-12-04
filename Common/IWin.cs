@@ -16,7 +16,7 @@ namespace Common
 
 
         [OperationContract]
-        bool KreirajNalog(Account acc, byte[] signature);
+        bool KreirajNalog(byte[] recievedData, byte[] signature);
 
 
         [OperationContract]
