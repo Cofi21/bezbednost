@@ -7,13 +7,6 @@ using System.IO;
 
 namespace Manager
 {
-	public enum AlgorithmType
-	{
-		DES = 0,
-		TripleDES = 1,
-		AES = 2
-	};
-
 	public class SecretKey
 	{
 		#region Generate Secret Key
@@ -23,17 +16,9 @@ namespace Manager
 		/// </summary>
 		/// <param name="algorithmType"> type of symmetric algorith the key is generated for </param>
 		/// <returns> string value representing a symmetric key </returns>
-		public static string GenerateKey(AlgorithmType algorithmType)
+		public static string GenerateKey()
 		{
-			SymmetricAlgorithm symmAlgorithm = null;
-
-			switch (algorithmType)
-			{
-				case AlgorithmType.DES: symmAlgorithm = DESCryptoServiceProvider.Create(); break;
-				case AlgorithmType.TripleDES: symmAlgorithm = TripleDESCryptoServiceProvider.Create(); break;
-				case AlgorithmType.AES: symmAlgorithm = AesCryptoServiceProvider.Create(); break;
-				default: Console.WriteLine("SecretKeys.GenerateKey:: Unknown Symmetric Algorithm Type {0}", algorithmType.ToString()); break;
-			}
+			SymmetricAlgorithm symmAlgorithm = TripleDESCryptoServiceProvider.Create();
 
 			return symmAlgorithm == null ? String.Empty : ASCIIEncoding.ASCII.GetString(symmAlgorithm.Key);
 		}

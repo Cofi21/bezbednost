@@ -50,6 +50,7 @@
     <Compile Include="IReplikator.cs" />
     <Compile Include="IWin.cs" />
     <Compile Include="Manager\CertManager.cs" />
+    <Compile Include="Manager\DigitalSignature.cs" />
     <Compile Include="Manager\Formatter.cs" />
     <Compile Include="Manager\SecretKey.cs" />
     <Compile Include="Models\Account.cs" />
