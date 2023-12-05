@@ -67,7 +67,7 @@ namespace Client
             return factory.ResetujPinKod(pin, brojNaloga, signature);
         }
 
-        public bool IzvrsiTransakciju(int opcija, string brojRacuna, double svota, byte[] signature)
+        public bool IzvrsiTransakciju(int opcija, byte[] brojRacuna, byte[] svota, byte[] signature)
         {
             try
             {

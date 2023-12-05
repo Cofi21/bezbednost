@@ -55,6 +55,7 @@ namespace Client
         static void CertConnection(int operacija)
         {
             string srvCertCN = "server";
+            string secretKey = "123456";
 
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
@@ -84,6 +85,8 @@ namespace Client
                         Console.Write("Unesite broj racuna na kom ce se izvrsiti transakcija: ");
                         string brojRacuna = Console.ReadLine();
                         double svotaNovca = 0;
+                        byte[] brojRacunaEncrypted = EncryptString(brojRacuna, secretKey);
+                        byte[] svotaNovcaEnc = EncryptDouble(svotaNovca, secretKey);
                         byte[] signature = DigitalSignature.Create(izbor.ToString(), Manager.HashAlgorithm.SHA1, certificateSign);
 
                         if (izbor == 1)
@@ -91,7 +94,7 @@ namespace Client
                             Console.Write("Unesite koliko novca zelite da uplatite: ");
                             svotaNovca = Double.Parse(Console.ReadLine());
                             Console.WriteLine("PRE");
-                            if (proxy.IzvrsiTransakciju(izbor, brojRacuna, svotaNovca, signature)) Console.WriteLine($"Uspesno ste uplatili {svotaNovca} dinara.");
+                            if (proxy.IzvrsiTransakciju(izbor, brojRacunaEncrypted, svotaNovcaEnc, signature)) Console.WriteLine($"Uspesno ste uplatili {svotaNovca} dinara.");
                             else Console.WriteLine("Transakcija nije moguca! Uneli ste nepostojeci broj racuna!");
                             Console.WriteLine("POSLE");
                         }
@@ -99,7 +102,7 @@ namespace Client
                         {
                             Console.Write("Unesite koliko novca zelite da podignete: ");
                             svotaNovca = Double.Parse(Console.ReadLine());
-                            if (proxy.IzvrsiTransakciju(izbor, brojRacuna, svotaNovca, signature)) Console.WriteLine($"Uspesno ste podigli {svotaNovca} dinara.");
+                            if (proxy.IzvrsiTransakciju(izbor, brojRacunaEncrypted, svotaNovcaEnc, signature)) Console.WriteLine($"Uspesno ste podigli {svotaNovca} dinara.");
                             else Console.WriteLine("Transakcija nije moguca! Uneli ste nepostojeci broj racuna ili nemate dovoljno sredstava na racunu!");
                         }
 
@@ -315,5 +318,22 @@ namespace Client
             return TripleDES_Symm_Algorithm.Encrypt(serializedAccount, secretKey);
         }
 
+        public static byte[] EncryptString(string message, string secretKey)
+        {
+            byte[] bytesToEncrypt = Encoding.UTF8.GetBytes(message);
+
+            byte[] encryptedBytes = TripleDES_Symm_Algorithm.Encrypt(bytesToEncrypt, secretKey);
+
+            return encryptedBytes;
+        }
+
+        public static byte[] EncryptDouble(double amount, string secretKey)
+        {
+            byte[] bytesToEncrypt = BitConverter.GetBytes(amount);
+
+            byte[] encryptedBytes = TripleDES_Symm_Algorithm.Encrypt(bytesToEncrypt, secretKey);
+
+            return encryptedBytes;
+        }
     }
 }

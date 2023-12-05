@@ -2,6 +2,7 @@
 using Common.Manager;
 using Common.Models;
 using Manager;
+using SymmetricAlgorithms;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace BankService
             Console.WriteLine("Communication established.");
         }
 
-
+        private string secretKey = "123456";
         public bool IzdajKarticu()
         {
             throw new NotImplementedException();
@@ -59,10 +60,12 @@ namespace BankService
             }
         }
 
-        public bool IzvrsiTransakciju(int opcija, string brojRacuna, double svota, byte[] signature)
+        public bool IzvrsiTransakciju(int opcija, byte[] brojRacunaEnc, byte[] svotaNovca, byte[] signature)
         {
             try
             {
+                double svota = DecryptDouble(svotaNovca, secretKey);
+                string brojRacuna = DecryptString(brojRacunaEnc, secretKey);
 
                 if (ValidSignature(opcija.ToString(), signature))
                 {
@@ -127,6 +130,26 @@ namespace BankService
 
             if (DigitalSignature.Verify(message, HashAlgorithm.SHA1, signature, certificate)) return true;
             else return false;
-        } 
+        }
+
+        public static string DecryptString(byte[] encryptedData, string secretKey)
+        {
+            byte[] decryptedBytes = TripleDES_Symm_Algorithm.Decrypt(encryptedData, secretKey);
+
+            // Konvertovanje dekriptovanih bajtova u string
+            string decryptedString = Encoding.UTF8.GetString(decryptedBytes);
+
+            return decryptedString;
+        }
+
+        public static double DecryptDouble(byte[] encryptedData, string secretKey)
+        {
+            byte[] decryptedBytes = TripleDES_Symm_Algorithm.Decrypt(encryptedData, secretKey);
+
+            double decryptedDouble = BitConverter.ToDouble(decryptedBytes, 0);
+
+            return decryptedDouble;
+        }
+
     }
 }
