@@ -15,7 +15,7 @@ namespace Common
         void Posalji(List<Account> studenti);
 
         [OperationContract]
-        List<Account> Preuzmi(DateTime vremeReplikacije);
+        List<Account> Preuzmi();
 
     }
 }

@@ -15,7 +15,6 @@ namespace Replikator
         static void Main(string[] args)
         {
             bool isFirstTime = true;
-            DateTime time = DateTime.Now;
             while (true)
             {
                 try
@@ -34,13 +33,11 @@ namespace Replikator
                     if (isFirstTime)
                     {
                         odrediste.Posalji(IMDatabase.AllUserAccountsDB.Values.ToList());
-                        time = DateTime.Now;
                         isFirstTime = false; 
                     }
                     else
                     {
-                        List<Account> accounts = izvor.Preuzmi(time);
-                        time = DateTime.Now;
+                        List<Account> accounts = izvor.Preuzmi();
                         odrediste.Posalji(accounts);
                         /*foreach (var acc in accounts)
                         {

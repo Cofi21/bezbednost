@@ -18,7 +18,7 @@ namespace BankService
             }
         }
 
-        public List<Account> Preuzmi(DateTime vremeReplikacije)
+        public List<Account> Preuzmi()
         {
             List<Account> accounts = new List<Account>();
 

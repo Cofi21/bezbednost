@@ -30,46 +30,51 @@ namespace BankService
 
         public bool KreirajNalog(byte[] recievedData, byte[] signature)
         {
-            string name = Common.Manager.Formatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
             Account acc = DecryptAndDeserializeAccount(recievedData, secretKey);
-            
+            string name = Common.Manager.Formatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
             //if (ValidSignature(acc.BrojRacuna, signature))
             //{
+            try
+            {
+                Registracija();
 
-            if (!IMDatabase.UsersDB.ContainsKey(name))
+                // Ucitavanje korisnika je odradjeno u funkciji Registracija()
+                LoadAccounts();
+                LoadMasterCards();
+            }catch(Exception e)
+            {
+                Console.WriteLine(e.Message + "\n" + e.StackTrace);
+            }
+            try
+            {
+                if (IMDatabase.AllUserAccountsDB.ContainsKey(acc.BrojRacuna))
                 {
-                    IMDatabase.UsersDB.Add(name, new User(name));
-                }
-                Console.WriteLine("Dodat user u bazu");
-                try
-                {
-                    if (IMDatabase.AllUserAccountsDB.ContainsKey(acc.BrojRacuna))
-                    {
-                        Console.WriteLine("Vec postoji racun sa unetim brojem!");
-                        return false;
-                    }
-                    else
-                    { 
-                        MasterCard mc = new MasterCard(name, acc.Pin);
-                        acc.MasterCards.Add(mc);
-
-                        IMDatabase.UsersDB[name].UserAccounts.Add(acc.BrojRacuna, acc);
-                        IMDatabase.AllUserAccountsDB.Add(acc.BrojRacuna, acc);
-
-                        //Ispis radi provere
-                        foreach (Account ac in IMDatabase.AllUserAccountsDB.Values)
-                        {
-                            Console.WriteLine(ac.ToString());
-                        }
-                        Console.WriteLine("Uspesno");
-                        return true;
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message + "\n" + e.StackTrace);
+                    Console.WriteLine("Vec postoji racun sa unetim brojem!");
                     return false;
                 }
+                else
+                { 
+                    MasterCard mc = new MasterCard(name, acc.Pin);
+                    acc.MasterCards.Add(mc);
+                    IMDatabase.MasterCardsDB.Add(mc);
+                    
+                    IMDatabase.UsersDB[name].UserAccounts.Add(acc.BrojRacuna, acc);
+                    IMDatabase.AllUserAccountsDB.Add(acc.BrojRacuna, acc);
+
+                    // Cuvanje korisnika je takodje odradjeno u funkciji Registracija()
+                    Json.SaveAccountsToFile(IMDatabase.AllUserAccountsDB);
+                    Json.SaveMasterCardsToFile(IMDatabase.MasterCardsDB);
+                    Json.SaveUsersToFile(IMDatabase.UsersDB);
+
+                    Console.WriteLine("Uspesno");
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message + "\n" + e.StackTrace);
+                return false;
+            }
 
             //}
             /*else
@@ -121,6 +126,7 @@ namespace BankService
 
         public static void IzdajSertifikat(string name, string pin)
         {
+            //Prepraviti na TestCA 
             string cmd = "/c makecert -sv " + name + ".pvk -iv RootCA.pvk -n \"CN=" + name + "\" -pe -ic RootCA.cer " + name + ".cer -sr localmachine -ss My -sky exchange";
             System.Diagnostics.Process.Start("cmd.exe", cmd).WaitForExit();
 
@@ -134,13 +140,45 @@ namespace BankService
             System.Diagnostics.Process.Start("cmd.exe", cmdSign2).WaitForExit();
         }
 
-        public static void SaveAccountToFile(Account account, string filePath)
+        public static void LoadAccounts()
         {
-            string json = JsonConvert.SerializeObject(account);
-
-            // Čuvanje JSON podataka u fajlu
-            File.WriteAllText(filePath, json);
+            string filePath = "JsonDB/Accounts.json";
+            FileInfo info = new FileInfo(filePath);
+            if (info.Length != 0)
+            {
+                IMDatabase.AllUserAccountsDB = Json.LoadAccountsFromFile();
+            }
         }
 
+        public static void LoadMasterCards()
+        {
+            string filePath = "JsonDB/MasterCards.json";
+            FileInfo info = new FileInfo(filePath);
+            if (info.Length != 0)
+            {
+                IMDatabase.MasterCardsDB = Json.LoadMasterCardsFromFile();
+            }
+        }
+
+        public static bool Registracija()
+        {
+            string filePath = "JsonDB/MasterCards.json";
+            FileInfo info = new FileInfo(filePath);
+            if (info.Length != 0)
+            {
+                IMDatabase.UsersDB = Json.LoadUsersFromFile();
+            }
+            string name = Common.Manager.Formatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
+            if(!IMDatabase.UsersDB.ContainsKey(name))
+            {
+                IMDatabase.UsersDB.Add(name, new User(name));
+                Json.SaveUsersToFile(IMDatabase.UsersDB);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

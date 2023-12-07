@@ -156,7 +156,8 @@ namespace Client
                     {
                         case 1:
                             Account acc = KreirajNalog();
-                            byte[] signature = DigitalSignature.Create(acc.BrojRacuna, Manager.HashAlgorithm.SHA1, certificateSign);
+                            byte[] signature = null;
+                            //byte[] signature = DigitalSignature.Create(acc.BrojRacuna, Manager.HashAlgorithm.SHA1, certificateSign);
                             byte[] account = CreateEncryptedAccount(acc, secretKey);
                             if (proxy.KreirajNalog(account, signature))
                             {

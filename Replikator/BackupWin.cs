@@ -41,9 +41,9 @@ namespace Replikator
             factory.Posalji(studenti);
         }
 
-        public List<Account> Preuzmi(DateTime vremeReplikacije)
+        public List<Account> Preuzmi()
         {
-            return factory.Preuzmi(vremeReplikacije);
+            return factory.Preuzmi();
         }
     }
 }

@@ -12,16 +12,17 @@ namespace Common.Manager
     public class Json
     {
 
-        public static void SaveDictionaryToFile(Dictionary<string, Account> accountDictionary, string filePath)
+        public static void SaveAccountsToFile(Dictionary<string, Account> accountDictionary)
         {
+            string filePath = "JsonDB/Accounts.json";
             string json = JsonConvert.SerializeObject(accountDictionary);
 
-            // Čuvanje JSON podataka u fajlu
             File.WriteAllText(filePath, json);
         }
 
-        public static Dictionary<string, Account> LoadDictionaryFromFile(string filePath)
+        public static Dictionary<string, Account> LoadAccountsFromFile()
         {
+            string filePath = "JsonDB/Accounts.json";
             if (File.Exists(filePath))
             {
                 string json = File.ReadAllText(filePath);
@@ -34,17 +35,18 @@ namespace Common.Manager
             }
         }
 
-        public static void SaveListToFile(List<MasterCard> masterCardList, string filePath)
+        public static void SaveMasterCardsToFile(List<MasterCard> masterCardList)
         {
+            string filePath = "JsonDB/MasterCards.json";
             string json = JsonConvert.SerializeObject(masterCardList);
 
-            // Čuvanje JSON podataka u fajlu
             File.WriteAllText(filePath, json);
         }
 
-        // Metoda za učitavanje liste MasterCard objekata iz JSON fajla
-        public static List<MasterCard> LoadListFromFile(string filePath)
+        public static List<MasterCard> LoadMasterCardsFromFile()
         {
+            string filePath = "JsonDB/MasterCards.json";
+            
             if (File.Exists(filePath))
             {
                 string json = File.ReadAllText(filePath);
@@ -57,21 +59,22 @@ namespace Common.Manager
             }
         }
 
-        public static void SaveUserToFile(User user, string filePath)
+        public static void SaveUsersToFile(Dictionary<string, User> usersDictionary)
         {
-            string json = JsonConvert.SerializeObject(user);
+            string filePath = "JsonDB/Users.json";
+            string json = JsonConvert.SerializeObject(usersDictionary);
 
-            // Čuvanje JSON podataka u fajlu
             File.WriteAllText(filePath, json);
         }
 
-        public static User LoadUserFromFile(string filePath)
+        public static Dictionary<string, User> LoadUsersFromFile()
         {
+            string filePath = "JsonDB/Users.json";
             if (File.Exists(filePath))
             {
                 string json = File.ReadAllText(filePath);
-                User user = JsonConvert.DeserializeObject<User>(json);
-                return user;
+                Dictionary<string, User> usersDictionary = JsonConvert.DeserializeObject<Dictionary<string, User>>(json);
+                return usersDictionary;
             }
             else
             {
