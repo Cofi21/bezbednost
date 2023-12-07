@@ -2,6 +2,7 @@
 using Common.Manager;
 using Common.Models;
 using Manager;
+using Newtonsoft.Json;
 using SymmetricAlgorithms;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
 
 
 namespace BankService
@@ -30,10 +32,11 @@ namespace BankService
         {
             string name = Common.Manager.Formatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
             Account acc = DecryptAndDeserializeAccount(recievedData, secretKey);
-            if (ValidSignature(acc.BrojRacuna, signature))
-            {
+            
+            //if (ValidSignature(acc.BrojRacuna, signature))
+            //{
 
-                if (!IMDatabase.UsersDB.ContainsKey(name))
+            if (!IMDatabase.UsersDB.ContainsKey(name))
                 {
                     IMDatabase.UsersDB.Add(name, new User(name));
                 }
@@ -67,11 +70,12 @@ namespace BankService
                     Console.WriteLine(e.Message + "\n" + e.StackTrace);
                     return false;
                 }
-            }
-            else
+
+            //}
+            /*else
             {
                 return false;
-            }
+            }*/
         }
 
         public bool PovuciSertifikat()
@@ -113,6 +117,29 @@ namespace BankService
         {
             byte[] decryptedData = TripleDES_Symm_Algorithm.Decrypt(encryptedData, secretKey);
             return DeserializeAccount(decryptedData);
+        }
+
+        public static void IzdajSertifikat(string name, string pin)
+        {
+            string cmd = "/c makecert -sv " + name + ".pvk -iv RootCA.pvk -n \"CN=" + name + "\" -pe -ic RootCA.cer " + name + ".cer -sr localmachine -ss My -sky exchange";
+            System.Diagnostics.Process.Start("cmd.exe", cmd).WaitForExit();
+
+            string cmd2 = "/c pvk2pfx.exe /pvk " + name + ".pvk /pi " + pin + " /spc " + name + ".cer /pfx " + name + ".pfx";
+            System.Diagnostics.Process.Start("cmd.exe", cmd2).WaitForExit();
+
+            string cmdSign1 = "/c makecert -sv " + name + "_sign.pvk -iv RootCA.pvk -n \"CN=" + name + "_sign" + "\" -pe -ic RootCA.cer " + name + "_sign.cer -sr localmachine -ss My -sky signature";
+            System.Diagnostics.Process.Start("cmd.exe", cmdSign1).WaitForExit();
+
+            string cmdSign2 = "/c pvk2pfx.exe /pvk " + name + "_sign.pvk /pi " + pin + " /spc " + name + "_sign.cer /pfx " + name + "_sign.pfx";
+            System.Diagnostics.Process.Start("cmd.exe", cmdSign2).WaitForExit();
+        }
+
+        public static void SaveAccountToFile(Account account, string filePath)
+        {
+            string json = JsonConvert.SerializeObject(account);
+
+            // Čuvanje JSON podataka u fajlu
+            File.WriteAllText(filePath, json);
         }
 
     }
