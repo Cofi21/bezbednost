@@ -14,7 +14,7 @@ namespace BankService
         {
             foreach(Account acc in accounts)
             {
-                IMDatabase.AllUserAccountsDB[acc.BrojRacuna] = acc;
+                IMDatabase.AccountsDB[acc.BrojRacuna] = acc;
             }
         }
 
@@ -22,7 +22,7 @@ namespace BankService
         {
             List<Account> accounts = new List<Account>();
 
-            foreach(Account acc in IMDatabase.AllUserAccountsDB.Values)
+            foreach(Account acc in IMDatabase.AccountsDB.Values)
             {
                     accounts.Add(acc);
             }

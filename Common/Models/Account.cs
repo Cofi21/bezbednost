@@ -65,7 +65,7 @@ namespace Common.Models
 
         public override string ToString()
         {
-            return "Broj racuna: " + BrojRacuna + "\n" + "Stanje: " + Stanje;
+            return BrojRacuna + "|"  + Stanje;
         }
     }
 }

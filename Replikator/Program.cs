@@ -32,7 +32,7 @@ namespace Replikator
 
                     if (isFirstTime)
                     {
-                        odrediste.Posalji(IMDatabase.AllUserAccountsDB.Values.ToList());
+                        odrediste.Posalji(IMDatabase.AccountsDB.Values.ToList());
                         isFirstTime = false; 
                     }
                     else

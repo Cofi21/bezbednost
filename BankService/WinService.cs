@@ -25,62 +25,63 @@ namespace BankService
         private string secretKey = "123456";
         public void TestCommunication()
         {
-            Console.WriteLine("Communication established.");
+          //  IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
+          //  IMDatabase.MasterCardsDB = Json.LoadMasterCardsFromFile();
+          //  IMDatabase.UsersDB = Json.LoadUsersFromFile();
         }
 
         public bool KreirajNalog(byte[] recievedData, byte[] signature)
         {
             Account acc = DecryptAndDeserializeAccount(recievedData, secretKey);
             string name = Common.Manager.Formatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
-            //if (ValidSignature(acc.BrojRacuna, signature))
-            //{
-            try
+            if (ValidSignature(recievedData.ToString(), signature))
             {
-                Registracija();
-
-                // Ucitavanje korisnika je odradjeno u funkciji Registracija()
-                LoadAccounts();
-                LoadMasterCards();
-            }catch(Exception e)
-            {
-                Console.WriteLine(e.Message + "\n" + e.StackTrace);
-            }
-            try
-            {
-                if (IMDatabase.AllUserAccountsDB.ContainsKey(acc.BrojRacuna))
+                try
                 {
-                    Console.WriteLine("Vec postoji racun sa unetim brojem!");
+                    Registracija();
+
+                    // Ucitavanje korisnika je odradjeno u funkciji Registracija()
+                    LoadAccounts();
+                    LoadMasterCards();
+                }catch(Exception e)
+                {
+                    Console.WriteLine(e.Message + "\n" + e.StackTrace);
+                }
+                try
+                {
+                    if (IMDatabase.AccountsDB.ContainsKey(acc.BrojRacuna))
+                    {
+                        Console.WriteLine("Vec postoji racun sa unetim brojem!");
+                        return false;
+                    }
+                    else
+                    { 
+                        MasterCard mc = new MasterCard(name, acc.Pin);
+                        acc.MasterCards.Add(mc);
+                        IMDatabase.MasterCardsDB.Add(mc);
+                        
+                        IMDatabase.UsersDB[name].UserAccounts.Add(acc.BrojRacuna, acc);
+                        IMDatabase.AccountsDB.Add(acc.BrojRacuna, acc);
+
+                        // Cuvanje korisnika je takodje odradjeno u funkciji Registracija()
+                        Json.SaveAccountsToFile(IMDatabase.AccountsDB);
+                        Json.SaveMasterCardsToFile(IMDatabase.MasterCardsDB);
+                        Json.SaveUsersToFile(IMDatabase.UsersDB);
+
+                        Console.WriteLine("Uspesno");
+                        return true;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message + "\n" + e.StackTrace);
                     return false;
                 }
-                else
-                { 
-                    MasterCard mc = new MasterCard(name, acc.Pin);
-                    acc.MasterCards.Add(mc);
-                    IMDatabase.MasterCardsDB.Add(mc);
-                    
-                    IMDatabase.UsersDB[name].UserAccounts.Add(acc.BrojRacuna, acc);
-                    IMDatabase.AllUserAccountsDB.Add(acc.BrojRacuna, acc);
-
-                    // Cuvanje korisnika je takodje odradjeno u funkciji Registracija()
-                    Json.SaveAccountsToFile(IMDatabase.AllUserAccountsDB);
-                    Json.SaveMasterCardsToFile(IMDatabase.MasterCardsDB);
-                    Json.SaveUsersToFile(IMDatabase.UsersDB);
-
-                    Console.WriteLine("Uspesno");
-                    return true;
-                }
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message + "\n" + e.StackTrace);
-                return false;
-            }
-
-            //}
-            /*else
+            else
             {
                 return false;
-            }*/
+            }
         }
 
         public bool PovuciSertifikat()
@@ -90,7 +91,7 @@ namespace BankService
 
         public Dictionary<string, Account> ReadDict()
         {
-            return IMDatabase.AllUserAccountsDB;
+            return IMDatabase.AccountsDB;
         }
 
         public Dictionary<string, User> ReadDictUsers()
@@ -146,7 +147,7 @@ namespace BankService
             FileInfo info = new FileInfo(filePath);
             if (info.Length != 0)
             {
-                IMDatabase.AllUserAccountsDB = Json.LoadAccountsFromFile();
+                IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
             }
         }
 
@@ -179,6 +180,14 @@ namespace BankService
             {
                 return false;
             }
+        }
+        public static byte[] EncryptString(string message, string secretKey)
+        {
+            byte[] bytesToEncrypt = Encoding.UTF8.GetBytes(message);
+
+            byte[] encryptedBytes = TripleDES_Symm_Algorithm.Encrypt(bytesToEncrypt, secretKey);
+
+            return encryptedBytes;
         }
     }
 }

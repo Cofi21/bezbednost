@@ -5,7 +5,9 @@ using Manager;
 using SymmetricAlgorithms;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceModel;
@@ -16,12 +18,15 @@ namespace BankService
 {
     public class SertService : ICert
     {
+        private string secretKey = "123456";
+
         public void TestCommunication()
         {
-            Console.WriteLine("Communication established.");
+        //    IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
+        //    IMDatabase.MasterCardsDB = Json.LoadMasterCardsFromFile();
+         //   IMDatabase.UsersDB = Json.LoadUsersFromFile();
         }
 
-        private string secretKey = "123456";
         public bool IzdajKarticu()
         {
             throw new NotImplementedException();
@@ -32,18 +37,31 @@ namespace BankService
             throw new NotImplementedException();
         }
 
-        public bool ResetujPinKod(string pin, string brojNaloga, byte[] signature)
+        public bool ResetujPinKod(byte[] encMess, byte[] signature)
         {
-            if(ValidSignature(brojNaloga, signature))
+            Console.WriteLine();
+            string decMess = DecryptString(encMess, secretKey);
+            Console.WriteLine("decMess " + decMess);
+            string[] parts = decMess.Split('|');
+            Console.WriteLine("parts " + parts);
+            string pin = parts[0];
+            Console.WriteLine("pin" + pin);
+            string brojNaloga = parts[1];
+            Console.WriteLine("broj naloga " + brojNaloga);
+            byte[] key = Convert.FromBase64String(pin);
+            string encPin = DecryptString(key, secretKey);
+            Console.WriteLine("Enc pin "+ encPin);
+
+            if (ValidSignature(brojNaloga, signature))
             {
-                if (IMDatabase.AllUserAccountsDB.ContainsKey(brojNaloga.Trim()))
+                if (IMDatabase.AccountsDB.ContainsKey(brojNaloga.Trim()))
                 {
-                    IMDatabase.AllUserAccountsDB[brojNaloga].Pin = pin;
-                    foreach (MasterCard mc in IMDatabase.AllUserAccountsDB[brojNaloga].MasterCards)
+                    IMDatabase.AccountsDB[brojNaloga].Pin = encPin;
+                    foreach (MasterCard mc in IMDatabase.AccountsDB[brojNaloga].MasterCards)
                     {
                         if (mc.SubjectName.Equals(WindowsIdentity.GetCurrent().Name))
                         {
-                            mc.Pin = pin;
+                            mc.Pin = encPin;
                         }
                     }
 
@@ -60,48 +78,75 @@ namespace BankService
             }
         }
 
-        public bool IzvrsiTransakciju(int opcija, byte[] brojRacunaEnc, byte[] svotaNovca, byte[] signature)
+        public bool IzvrsiTransakciju(byte[] transaction, byte[] signature, byte[] encPin)
         {
             try
             {
-                double svota = DecryptDouble(svotaNovca, secretKey);
-                string brojRacuna = DecryptString(brojRacunaEnc, secretKey);
+                Transaction decTrans = DecryptAndDeserializeAccount(transaction, secretKey);
+                string pin = DecryptString(encPin, secretKey);
 
-                if (ValidSignature(opcija.ToString(), signature))
+                if (ValidSignature(transaction.ToString(), signature))
                 {
                     Console.WriteLine("Sign is valid");
-                    if (opcija == 1)
+                    if (decTrans.Akcija == 1)
                     {
-                        if (IMDatabase.AllUserAccountsDB.ContainsKey(brojRacuna))
+                        if (IMDatabase.AccountsDB.ContainsKey(decTrans.BrojRacuna))
                         {
-                            IMDatabase.AllUserAccountsDB[brojRacuna].Stanje += svota;
-                            Console.WriteLine($"Uspesna uplata!");
-                            return true;
+                            byte[] key = Convert.FromBase64String(IMDatabase.AccountsDB[decTrans.BrojRacuna].Pin);
+                            string keyPin = DecryptString(key, secretKey);
+
+                            if (keyPin.Equals(pin))
+                            {
+                                IMDatabase.AccountsDB[decTrans.BrojRacuna].Stanje += decTrans.Svota;
+                                Console.WriteLine($"Uspesna uplata!");
+                                Json.SaveAccountsToFile(IMDatabase.AccountsDB);
+                                Json.SaveMasterCardsToFile(IMDatabase.MasterCardsDB);
+                                Json.SaveUsersToFile(IMDatabase.UsersDB);
+                                return true;
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Uneli ste los pin code");
+                            }
                         }
                         else
                         {
-                            Console.WriteLine($"Neuspesna uplata! Ne postoji racun sa brojem {brojRacuna}");
+                            Console.WriteLine($"Neuspesna uplata! Ne postoji racun sa brojem {decTrans.BrojRacuna}");
                             return false;
                         }
                     }
-                    else if (opcija == 2)
+                    else if (decTrans.Akcija == 2)
                     {
-                        if (IMDatabase.AllUserAccountsDB.ContainsKey(brojRacuna))
+                        if (IMDatabase.AccountsDB.ContainsKey(decTrans.BrojRacuna))
                         {
-                            double trenutnoStanje = IMDatabase.AllUserAccountsDB[brojRacuna].Stanje;
+                            byte[] key = Convert.FromBase64String(IMDatabase.AccountsDB[decTrans.BrojRacuna].Pin);
+                            string keyPin = DecryptString(key, secretKey);
 
-                            if (trenutnoStanje < svota)
+                            if (keyPin.Equals(pin))
                             {
-                                Console.WriteLine($"Na racunu nemate dovoljno sretstava za isplatu!");
-                                return false;
+
+                                double trenutnoStanje = IMDatabase.AccountsDB[decTrans.BrojRacuna].Stanje;
+
+                                if (trenutnoStanje < decTrans.Svota)
+                                {
+                                    Console.WriteLine($"Na racunu nemate dovoljno sretstava za isplatu!");
+                                    return false;
+                                }
+                                IMDatabase.AccountsDB[decTrans.BrojRacuna].Stanje -= decTrans.Svota;
+                                Console.WriteLine($"Uspesna isplata!");
+                                Json.SaveAccountsToFile(IMDatabase.AccountsDB);
+                                Json.SaveMasterCardsToFile(IMDatabase.MasterCardsDB);
+                                Json.SaveUsersToFile(IMDatabase.UsersDB);
+                                return true;
                             }
-                            IMDatabase.AllUserAccountsDB[brojRacuna].Stanje -= svota;
-                            Console.WriteLine($"Uspesna isplata!");
-                            return true;
+                            else
+                            {
+                                Console.WriteLine($"Uneli ste los pin code");
+                            }
                         }
                         else
                         {
-                            Console.WriteLine($"Neuspesna uplata!Ne postoji racun sa brojem {brojRacuna}");
+                            Console.WriteLine($"Neuspesna uplata!Ne postoji racun sa brojem {decTrans.BrojRacuna} ili ste uneli los pin kod.");
                             return false;
                         }
 
@@ -120,10 +165,23 @@ namespace BankService
                 return false;
             }
         }
-   
+
+        public static Transaction DeserializeTransaction(byte[] data)
+        {
+            using (MemoryStream memoryStream = new MemoryStream(data))
+            {
+                DataContractSerializer serializer = new DataContractSerializer(typeof(Transaction));
+                return (Transaction)serializer.ReadObject(memoryStream);
+            }
+        }
+        public static Transaction DecryptAndDeserializeAccount(byte[] encryptedData, string secretKey)
+        {
+            byte[] decryptedData = TripleDES_Symm_Algorithm.Decrypt(encryptedData, secretKey);
+            return DeserializeTransaction(decryptedData);
+        }
         public bool ValidSignature(string message, byte[] signature) 
         {
-            string clientName = Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name);
+            string clientName = Common.Manager.Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name);
             string clientNameSign = clientName + "_ds";
 
             X509Certificate2 certificate = CertManager.GetCertificateFromStorage(StoreName.TrustedPeople, StoreLocation.LocalMachine, clientNameSign);
@@ -141,6 +199,7 @@ namespace BankService
 
             return decryptedString;
         }
+        /*
 
         public static double DecryptDouble(byte[] encryptedData, string secretKey)
         {
@@ -150,6 +209,6 @@ namespace BankService
 
             return decryptedDouble;
         }
-
+        */
     }
 }

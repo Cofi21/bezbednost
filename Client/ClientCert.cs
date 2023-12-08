@@ -1,5 +1,6 @@
 ﻿using Common;
 using Common.Manager;
+using Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -46,8 +47,6 @@ namespace Client
             this.Close();
         }
 
-
-
         public void TestCommunication()
         {
             try
@@ -61,18 +60,17 @@ namespace Client
             }
         }
 
-
-        public bool ResetujPinKod(string pin, string brojNaloga, byte[] signature)
+        public bool ResetujPinKod(byte[] encMess, byte[] signature)
         {
-            return factory.ResetujPinKod(pin, brojNaloga, signature);
+            return factory.ResetujPinKod(encMess, signature);
         }
 
-        public bool IzvrsiTransakciju(int opcija, byte[] brojRacuna, byte[] svota, byte[] signature)
+        public bool IzvrsiTransakciju(byte[] transaction, byte[] signature, byte[] encPin)
         {
             try
             {
 
-                return factory.IzvrsiTransakciju(opcija, brojRacuna, svota, signature);
+                return factory.IzvrsiTransakciju(transaction, signature, encPin);
             }catch(Exception e)
             {
                 Console.WriteLine(e.Message);

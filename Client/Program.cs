@@ -18,8 +18,6 @@ namespace Client
 {
     class Program
     {
-        
-
         static void Main(string[] args)
         {
             Console.WriteLine($"Logovani korisnik { WindowsIdentity.GetCurrent().Name}");
@@ -71,6 +69,7 @@ namespace Client
             {
                 try
                 {
+                    proxy.TestCommunication();
                     if(operacija == 3)
                     { 
                         Console.WriteLine("Certificate communication is active");
@@ -78,41 +77,63 @@ namespace Client
                         Console.WriteLine("\t1 - Uplata novca");
                         Console.WriteLine("\t2 - Podizanje novca ");
                         Console.WriteLine("\t0 - Izlaz");
+
                         Console.Write("Unesite Vas izbor: ");
                         int izbor = Int32.Parse(Console.ReadLine());
+                        double svotaNovca = 0;
 
                         if (izbor == 0) return;
+
                         Console.Write("Unesite broj racuna na kom ce se izvrsiti transakcija: ");
                         string brojRacuna = Console.ReadLine();
-                        double svotaNovca = 0;
-                        byte[] brojRacunaEncrypted = EncryptString(brojRacuna, secretKey);
-                        byte[] svotaNovcaEnc = EncryptDouble(svotaNovca, secretKey);
-                        byte[] signature = DigitalSignature.Create(izbor.ToString(), Manager.HashAlgorithm.SHA1, certificateSign);
 
                         if (izbor == 1)
                         {
                             Console.Write("Unesite koliko novca zelite da uplatite: ");
                             svotaNovca = Double.Parse(Console.ReadLine());
-                            Console.WriteLine("PRE");
-                            if (proxy.IzvrsiTransakciju(izbor, brojRacunaEncrypted, svotaNovcaEnc, signature)) Console.WriteLine($"Uspesno ste uplatili {svotaNovca} dinara.");
+
+                            Transaction transaction = new Transaction(izbor, brojRacuna, svotaNovca);
+
+                            byte[] transactionCrypted = CreateEncryptedTransaction(transaction, secretKey);
+                            byte[] signature = DigitalSignature.Create(transactionCrypted.ToString(), Manager.HashAlgorithm.SHA1, certificateSign);
+                            
+                            Console.Write("Unesite PIN: ");
+                            string pinCode = ReadPassword();
+                            byte[] encPin = CreateEncryptedPin(pinCode, secretKey);
+
+                            if (proxy.IzvrsiTransakciju(transactionCrypted, signature, encPin)) Console.WriteLine($"Uspesno ste uplatili {transaction.Svota} dinara.");
                             else Console.WriteLine("Transakcija nije moguca! Uneli ste nepostojeci broj racuna!");
-                            Console.WriteLine("POSLE");
                         }
                         else if (izbor == 2)
                         {
                             Console.Write("Unesite koliko novca zelite da podignete: ");
                             svotaNovca = Double.Parse(Console.ReadLine());
-                            if (proxy.IzvrsiTransakciju(izbor, brojRacunaEncrypted, svotaNovcaEnc, signature)) Console.WriteLine($"Uspesno ste podigli {svotaNovca} dinara.");
+
+                            Transaction transaction = new Transaction(izbor, brojRacuna, svotaNovca);
+
+                            byte[] transactionCrypted = CreateEncryptedTransaction(transaction, secretKey);
+                            byte[] signature = DigitalSignature.Create(transactionCrypted.ToString(), Manager.HashAlgorithm.SHA1, certificateSign);
+
+                            Console.Write("Unesite PIN: ");
+                            string pinCode = ReadPassword();
+                            byte[] encPin = CreateEncryptedPin(pinCode, secretKey);
+
+                            if (proxy.IzvrsiTransakciju(transactionCrypted, signature, encPin)) Console.WriteLine($"Uspesno ste podigli {svotaNovca} dinara.");
                             else Console.WriteLine("Transakcija nije moguca! Uneli ste nepostojeci broj racuna ili nemate dovoljno sredstava na racunu!");
                         }
 
                     }else if(operacija == 4)
                     {
+
+
                         Console.Write("Unesite broj naloga: ");
                         string brojNaloga = Console.ReadLine();
-                        string pin = ResetPin(brojNaloga);
+                        string pin = ResetPin(brojNaloga, secretKey);
+                        string message = pin + "|" + brojNaloga;
+
+                        byte[] encMess = EncryptString(message, secretKey);
                         byte[] signature = DigitalSignature.Create(brojNaloga, Manager.HashAlgorithm.SHA1, certificateSign);
-                        if (proxy.ResetujPinKod(pin, brojNaloga, signature))
+                        if (proxy.ResetujPinKod(encMess, signature))
                         {
                             Console.WriteLine("Uspesna promena pin koda!");
                         }
@@ -152,13 +173,15 @@ namespace Client
                 //ReadUsers(proxy);
                 try
                 {
+                    proxy.TestCommunication();
                     switch (broj)
                     {
                         case 1:
-                            Account acc = KreirajNalog();
-                            byte[] signature = null;
-                            //byte[] signature = DigitalSignature.Create(acc.BrojRacuna, Manager.HashAlgorithm.SHA1, certificateSign);
+                            Account acc = KreirajNalog(secretKey);
+                            if (acc == null) Console.WriteLine("Nalog je null");
                             byte[] account = CreateEncryptedAccount(acc, secretKey);
+                            byte[] signature = DigitalSignature.Create(account.ToString(), Manager.HashAlgorithm.SHA1, certificateSign);
+
                             if (proxy.KreirajNalog(account, signature))
                             {
                                 Console.WriteLine("Cestitamo! Uspesno ste kreirali nalog!");
@@ -218,7 +241,7 @@ namespace Client
 
             return password;
         }
-        public static Account KreirajNalog()
+        public static Account KreirajNalog(string secretKey)
         {
             Console.Write("Unesite broj naloga: ");
             string broj = Console.ReadLine();
@@ -227,11 +250,11 @@ namespace Client
             Console.Write("Potvrdite PIN: ");
             string pinPotvrda = ReadPassword();
 
-
-
             if (pin.Equals(pinPotvrda))
             {
-                return new Account(broj, pin);
+                byte[] key = EncryptString(pin, secretKey);
+                string pinCode = Convert.ToBase64String(key);
+                return new Account(broj, pinCode);
             }
             else
             {
@@ -240,13 +263,19 @@ namespace Client
             }
         }
 
-        public static string ResetPin(string brojNaloga)
+        public static string ResetPin(string brojNaloga, string secretKey)
         {
-          //  if(IMDatabase.AllUserAccountsDB.ContainsKey(brojNaloga.Trim()))
-       //     {
+            IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
+            if (IMDatabase.AccountsDB.ContainsKey(brojNaloga.Trim()))
+            {
                 Console.Write("Unesite stari Pin: ");
                 string stariPin = ReadPassword();
-                if (IMDatabase.AllUserAccountsDB[brojNaloga].Pin.Equals(stariPin))
+                string pinCode = string.Empty;
+
+                byte[] key = Convert.FromBase64String(IMDatabase.AccountsDB[brojNaloga].Pin);
+                string keyPin = DecryptString(key, secretKey);
+
+                if (keyPin.Equals(stariPin))
                 {
                     Console.Write("Unesite novi Pin: ");
                     string noviPin = ReadPassword();
@@ -254,6 +283,9 @@ namespace Client
                     string noviPinPotvrda = ReadPassword();
                     if (noviPin.Equals(noviPinPotvrda))
                     {
+                        byte[] newPin = EncryptString(noviPin, secretKey);
+                        pinCode = Convert.ToBase64String(newPin);
+
                         Console.WriteLine("Pin kod je uspesno promenjen!");
                     }
                     else
@@ -262,29 +294,30 @@ namespace Client
                         return null;
                     }
 
-                    return noviPin;
+                    return pinCode;
                 }
                 else
                 {
                     Console.WriteLine("Pogresan pin kod ili broj naloga. Pokusajte ponovo!");
-                    return null;
+                    return String.Empty;
                 }
-          //  }
-        //    else
-         //   {
-          //      Console.WriteLine("Greska! Uneti broj naloga ne postoji!");
-          //      return null;
-         //   }
+            }
+            else
+            {
+                Console.WriteLine("Greska! Uneti broj naloga ne postoji!");
+                return null;
+            }
+
         }
 
         public static void ReadAccounts(ClientWin proxy)
-        {
-            Dictionary<string, Account> AllUsersDict = proxy.ReadDict();
+        {                               //      return IMDatabase.AccountsDB;
+            Dictionary<string, Account> AllUsersDict = proxy.ReadDict();      
             foreach (Account acc in AllUsersDict.Values)
             {
-                if (!IMDatabase.AllUserAccountsDB.ContainsKey(acc.BrojRacuna))
+                if (!IMDatabase.AccountsDB.ContainsKey(acc.BrojRacuna))
                 {
-                    IMDatabase.AllUserAccountsDB.Add(acc.BrojRacuna, acc);
+                    IMDatabase.AccountsDB.Add(acc.BrojRacuna, acc);
                 }
             }
         }
@@ -313,12 +346,31 @@ namespace Client
             }
         }
 
+        public static byte[] SerializeTransaction(Transaction transaction)
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                DataContractSerializer serializer = new DataContractSerializer(typeof(Transaction));
+                serializer.WriteObject(memoryStream, transaction);
+                return memoryStream.ToArray();
+            }
+        }
+
         public static byte[] CreateEncryptedAccount(Account account, string secretKey)
         {
             byte[] serializedAccount = SerializeAccount(account);
             return TripleDES_Symm_Algorithm.Encrypt(serializedAccount, secretKey);
         }
+        public static byte[] CreateEncryptedPin(string pin, string secretKey)
+        {
+            return EncryptString(pin, secretKey);
+        }
 
+        public static byte[] CreateEncryptedTransaction(Transaction transaction, string secretKey)
+        {
+            byte[] serializedTransaction = SerializeTransaction(transaction);
+            return TripleDES_Symm_Algorithm.Encrypt(serializedTransaction, secretKey);
+        }
         public static byte[] EncryptString(string message, string secretKey)
         {
             byte[] bytesToEncrypt = Encoding.UTF8.GetBytes(message);
@@ -328,13 +380,25 @@ namespace Client
             return encryptedBytes;
         }
 
-        public static byte[] EncryptDouble(double amount, string secretKey)
+        public static string DecryptString(byte[] encryptedData, string secretKey)
         {
-            byte[] bytesToEncrypt = BitConverter.GetBytes(amount);
+            byte[] decryptedBytes = TripleDES_Symm_Algorithm.Decrypt(encryptedData, secretKey);
 
-            byte[] encryptedBytes = TripleDES_Symm_Algorithm.Encrypt(bytesToEncrypt, secretKey);
+            // Konvertovanje dekriptovanih bajtova u string
+            string decryptedString = Encoding.UTF8.GetString(decryptedBytes);
 
-            return encryptedBytes;
+            return decryptedString;
         }
+
+        /*
+
+                public static byte[] EncryptDouble(double amount, string secretKey)
+                {
+                    byte[] bytesToEncrypt = BitConverter.GetBytes(amount);
+
+                    byte[] encryptedBytes = TripleDES_Symm_Algorithm.Encrypt(bytesToEncrypt, secretKey);
+
+                    return encryptedBytes;
+                }*/
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Common.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ServiceModel;
@@ -14,10 +15,10 @@ namespace Common
         void TestCommunication();
 
         [OperationContract]
-        bool ResetujPinKod(string pin, string brojNaloga, byte[] signature);
+        bool ResetujPinKod(byte[] encMess, byte[] signature);
 
 
         [OperationContract]
-        bool IzvrsiTransakciju(int opcija, byte[] brojRacuna, byte[] svota, byte[] signature);
+        bool IzvrsiTransakciju(byte[] transaction, byte[] signature, byte[] encPin);
     }
 }
