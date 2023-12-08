@@ -13,6 +13,7 @@ using SymmetricAlgorithms;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Threading;
 
 namespace Client
 {
@@ -69,7 +70,7 @@ namespace Client
             {
                 try
                 {
-                    proxy.TestCommunication();
+                    //proxy.TestCommunication();
                     if(operacija == 3)
                     { 
                         Console.WriteLine("Certificate communication is active");
@@ -145,7 +146,7 @@ namespace Client
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.Message );
+                    Console.WriteLine(e.Message  + "\n" +e.StackTrace);
                 }
             }
         }
@@ -173,7 +174,7 @@ namespace Client
                 //ReadUsers(proxy);
                 try
                 {
-                    proxy.TestCommunication();
+                    //proxy.TestCommunication();
                     switch (broj)
                     {
                         case 1:
@@ -243,6 +244,10 @@ namespace Client
         }
         public static Account KreirajNalog(string secretKey)
         {
+            string logged = WindowsIdentity.GetCurrent().Name;
+            string[] parts = logged.Split('\\');
+            string username = parts[1];
+            Console.WriteLine("Username: " + username);
             Console.Write("Unesite broj naloga: ");
             string broj = Console.ReadLine();
             Console.Write("Unesite PIN: ");
@@ -254,7 +259,7 @@ namespace Client
             {
                 byte[] key = EncryptString(pin, secretKey);
                 string pinCode = Convert.ToBase64String(key);
-                return new Account(broj, pinCode);
+                return new Account(broj, pinCode, username);
             }
             else
             {
@@ -285,8 +290,6 @@ namespace Client
                     {
                         byte[] newPin = EncryptString(noviPin, secretKey);
                         pinCode = Convert.ToBase64String(newPin);
-
-                        Console.WriteLine("Pin kod je uspesno promenjen!");
                     }
                     else
                     {
@@ -321,20 +324,6 @@ namespace Client
                 }
             }
         }
-
-        /*
-        public static void ReadUsers(ClientWin proxy)
-        {
-            Dictionary<string, User> AllUsersDict = proxy.ReadDictUsers();
-            foreach (User u in AllUsersDict.Values)
-            {
-                if (!IMDatabase.UsersDB.ContainsKey(u.Username))
-                {
-                    IMDatabase.UsersDB.Add(u.Username, u);
-                }
-            }
-        }
-        */
 
         public static byte[] SerializeAccount(Account account)
         {

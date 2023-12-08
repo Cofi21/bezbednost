@@ -26,14 +26,23 @@ namespace Common.Manager
             if (File.Exists(filePath))
             {
                 string json = File.ReadAllText(filePath);
-                Dictionary<string, Account> accountDictionary = JsonConvert.DeserializeObject<Dictionary<string, Account>>(json);
-                return accountDictionary;
+
+                if (!string.IsNullOrWhiteSpace(json))
+                {
+                    Dictionary<string, Account> accountDictionary = JsonConvert.DeserializeObject<Dictionary<string, Account>>(json);
+                    return accountDictionary;
+                }
+                else
+                {
+                    return new Dictionary<string, Account>();
+                }
             }
             else
             {
-                throw new FileNotFoundException("Fajl ne postoji.");
+                throw new FileNotFoundException("File does not exist.");
             }
         }
+
 
         public static void SaveMasterCardsToFile(List<MasterCard> masterCardList)
         {
@@ -50,8 +59,16 @@ namespace Common.Manager
             if (File.Exists(filePath))
             {
                 string json = File.ReadAllText(filePath);
-                List<MasterCard> masterCardList = JsonConvert.DeserializeObject<List<MasterCard>>(json);
-                return masterCardList;
+                if (!string.IsNullOrWhiteSpace(json))
+                {
+                    List<MasterCard> masterCardList = JsonConvert.DeserializeObject<List<MasterCard>>(json);
+                    return masterCardList;
+                }
+                else
+                {
+                    return new List<MasterCard>();
+                }
+
             }
             else
             {
@@ -59,27 +76,5 @@ namespace Common.Manager
             }
         }
 
-        public static void SaveUsersToFile(Dictionary<string, User> usersDictionary)
-        {
-            string filePath = "JsonDB/Users.json";
-            string json = JsonConvert.SerializeObject(usersDictionary);
-
-            File.WriteAllText(filePath, json);
-        }
-
-        public static Dictionary<string, User> LoadUsersFromFile()
-        {
-            string filePath = "JsonDB/Users.json";
-            if (File.Exists(filePath))
-            {
-                string json = File.ReadAllText(filePath);
-                Dictionary<string, User> usersDictionary = JsonConvert.DeserializeObject<Dictionary<string, User>>(json);
-                return usersDictionary;
-            }
-            else
-            {
-                throw new FileNotFoundException("Fajl ne postoji.");
-            }
-        }
     }
 }

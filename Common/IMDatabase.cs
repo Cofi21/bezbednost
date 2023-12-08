@@ -9,7 +9,6 @@ namespace Common
 {
     public class IMDatabase
     {
-        public static Dictionary<string, User> UsersDB = new Dictionary<string, User>();
         public static Dictionary<string, Account> AccountsDB = new Dictionary<string, Account>();
         public static List<MasterCard> MasterCardsDB = new List<MasterCard>();
     }

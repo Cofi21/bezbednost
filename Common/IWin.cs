@@ -26,7 +26,5 @@ namespace Common
         [OperationContract]
         Dictionary<string, Account> ReadDict();
 
-        [OperationContract]
-        Dictionary<string, User> ReadDictUsers();
     }
 }

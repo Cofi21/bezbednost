@@ -25,9 +25,6 @@ namespace BankService
         private string secretKey = "123456";
         public void TestCommunication()
         {
-          //  IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
-          //  IMDatabase.MasterCardsDB = Json.LoadMasterCardsFromFile();
-          //  IMDatabase.UsersDB = Json.LoadUsersFromFile();
         }
 
         public bool KreirajNalog(byte[] recievedData, byte[] signature)
@@ -38,12 +35,10 @@ namespace BankService
             {
                 try
                 {
-                    Registracija();
-
-                    // Ucitavanje korisnika je odradjeno u funkciji Registracija()
-                    LoadAccounts();
-                    LoadMasterCards();
-                }catch(Exception e)
+                    IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
+                    IMDatabase.MasterCardsDB = Json.LoadMasterCardsFromFile();
+                }
+                catch(Exception e)
                 {
                     Console.WriteLine(e.Message + "\n" + e.StackTrace);
                 }
@@ -59,14 +54,10 @@ namespace BankService
                         MasterCard mc = new MasterCard(name, acc.Pin);
                         acc.MasterCards.Add(mc);
                         IMDatabase.MasterCardsDB.Add(mc);
-                        
-                        IMDatabase.UsersDB[name].UserAccounts.Add(acc.BrojRacuna, acc);
                         IMDatabase.AccountsDB.Add(acc.BrojRacuna, acc);
 
-                        // Cuvanje korisnika je takodje odradjeno u funkciji Registracija()
                         Json.SaveAccountsToFile(IMDatabase.AccountsDB);
                         Json.SaveMasterCardsToFile(IMDatabase.MasterCardsDB);
-                        Json.SaveUsersToFile(IMDatabase.UsersDB);
 
                         Console.WriteLine("Uspesno");
                         return true;
@@ -94,10 +85,6 @@ namespace BankService
             return IMDatabase.AccountsDB;
         }
 
-        public Dictionary<string, User> ReadDictUsers()
-        {
-            return IMDatabase.UsersDB;
-        }
         public bool ValidSignature(string message, byte[] signature)
         {
             string clientName = Common.Manager.Formatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
@@ -141,46 +128,7 @@ namespace BankService
             System.Diagnostics.Process.Start("cmd.exe", cmdSign2).WaitForExit();
         }
 
-        public static void LoadAccounts()
-        {
-            string filePath = "JsonDB/Accounts.json";
-            FileInfo info = new FileInfo(filePath);
-            if (info.Length != 0)
-            {
-                IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
-            }
-        }
-
-        public static void LoadMasterCards()
-        {
-            string filePath = "JsonDB/MasterCards.json";
-            FileInfo info = new FileInfo(filePath);
-            if (info.Length != 0)
-            {
-                IMDatabase.MasterCardsDB = Json.LoadMasterCardsFromFile();
-            }
-        }
-
-        public static bool Registracija()
-        {
-            string filePath = "JsonDB/MasterCards.json";
-            FileInfo info = new FileInfo(filePath);
-            if (info.Length != 0)
-            {
-                IMDatabase.UsersDB = Json.LoadUsersFromFile();
-            }
-            string name = Common.Manager.Formatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
-            if(!IMDatabase.UsersDB.ContainsKey(name))
-            {
-                IMDatabase.UsersDB.Add(name, new User(name));
-                Json.SaveUsersToFile(IMDatabase.UsersDB);
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
+     
         public static byte[] EncryptString(string message, string secretKey)
         {
             byte[] bytesToEncrypt = Encoding.UTF8.GetBytes(message);

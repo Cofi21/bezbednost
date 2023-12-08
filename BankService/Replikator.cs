@@ -1,4 +1,5 @@
 ﻿using Common;
+using Common.Manager;
 using Common.Models;
 using System;
 using System.Collections.Generic;
@@ -20,14 +21,15 @@ namespace BankService
 
         public List<Account> Preuzmi()
         {
-            List<Account> accounts = new List<Account>();
+            Dictionary<string, Account> accounts = Json.LoadAccountsFromFile();
+            List<Account> accountList = new List<Account>();
 
-            foreach(Account acc in IMDatabase.AccountsDB.Values)
+            foreach(Account acc in accounts.Values)
             {
-                    accounts.Add(acc);
+                accountList.Add(acc);
             }
 
-            return accounts;
+            return accountList;
         }
 
     }

@@ -22,9 +22,7 @@ namespace BankService
 
         public void TestCommunication()
         {
-        //    IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
-        //    IMDatabase.MasterCardsDB = Json.LoadMasterCardsFromFile();
-         //   IMDatabase.UsersDB = Json.LoadUsersFromFile();
+
         }
 
         public bool IzdajKarticu()
@@ -39,6 +37,7 @@ namespace BankService
 
         public bool ResetujPinKod(byte[] encMess, byte[] signature)
         {
+            IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
             Console.WriteLine();
             string decMess = DecryptString(encMess, secretKey);
             Console.WriteLine("decMess " + decMess);
@@ -65,6 +64,7 @@ namespace BankService
                         }
                     }
 
+                    Json.SaveAccountsToFile(IMDatabase.AccountsDB);
                     return true;
                 }
                 else
@@ -82,6 +82,9 @@ namespace BankService
         {
             try
             {
+                IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
+                IMDatabase.MasterCardsDB = Json.LoadMasterCardsFromFile();
+
                 Transaction decTrans = DecryptAndDeserializeAccount(transaction, secretKey);
                 string pin = DecryptString(encPin, secretKey);
 
@@ -101,7 +104,6 @@ namespace BankService
                                 Console.WriteLine($"Uspesna uplata!");
                                 Json.SaveAccountsToFile(IMDatabase.AccountsDB);
                                 Json.SaveMasterCardsToFile(IMDatabase.MasterCardsDB);
-                                Json.SaveUsersToFile(IMDatabase.UsersDB);
                                 return true;
                             }
                             else
@@ -136,7 +138,6 @@ namespace BankService
                                 Console.WriteLine($"Uspesna isplata!");
                                 Json.SaveAccountsToFile(IMDatabase.AccountsDB);
                                 Json.SaveMasterCardsToFile(IMDatabase.MasterCardsDB);
-                                Json.SaveUsersToFile(IMDatabase.UsersDB);
                                 return true;
                             }
                             else

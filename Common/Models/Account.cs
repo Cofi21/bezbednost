@@ -11,6 +11,7 @@ namespace Common.Models
     public class Account
     {
         private string brojRacuna;
+        private string username;
         private double stanje;
         private string pin;
         // dodato zbog replikacije
@@ -21,6 +22,8 @@ namespace Common.Models
 
         [DataMember]
         public string BrojRacuna { get => brojRacuna; set => brojRacuna = value; }
+        [DataMember]
+        public string Username { get => username; set => username = value; }
 
         [DataMember]
         public double Stanje { get => stanje; set => stanje = value; }
@@ -36,36 +39,29 @@ namespace Common.Models
             MasterCards = new List<MasterCard>();
         }
 
-        public Account(string brojRacuna, string pin)
+        public Account(string brojRacuna, string pin, string username)
         {
             BrojRacuna = brojRacuna;
+            Username = username;
             Stanje = 0;
             Pin = pin;
             MasterCards = new List<MasterCard>();
+        }
+
+
+
+        public override string ToString()
+        {
+            return $"Username: {Username}\nBroj racuna: {BrojRacuna}\nStanje: {Stanje}";
         }
 
         public override bool Equals(object obj)
         {
             return obj is Account account &&
                    brojRacuna == account.brojRacuna &&
+                   username == account.username &&
                    stanje == account.stanje &&
-                   BrojRacuna == account.BrojRacuna &&
-                   Stanje == account.Stanje;
-        }
-
-        public override int GetHashCode()
-        {
-            int hashCode = -1499122616;
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(brojRacuna);
-            hashCode = hashCode * -1521134295 + stanje.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(BrojRacuna);
-            hashCode = hashCode * -1521134295 + Stanje.GetHashCode();
-            return hashCode;
-        }
-
-        public override string ToString()
-        {
-            return BrojRacuna + "|"  + Stanje;
+                   pin == account.pin;
         }
     }
 }

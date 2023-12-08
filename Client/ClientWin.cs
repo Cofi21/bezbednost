@@ -69,10 +69,5 @@ namespace Client
         {
             return factory.ReadDict();
         }
-
-        public Dictionary<string, User> ReadDictUsers()
-        {
-            return factory.ReadDictUsers();
-        }
     }
 }
