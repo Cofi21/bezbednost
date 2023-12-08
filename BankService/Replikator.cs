@@ -21,10 +21,9 @@ namespace BankService
 
         public List<Account> Preuzmi()
         {
-            Dictionary<string, Account> accounts = Json.LoadAccountsFromFile();
             List<Account> accountList = new List<Account>();
 
-            foreach(Account acc in accounts.Values)
+            foreach(Account acc in IMDatabase.AccountsDB.Values)
             {
                 accountList.Add(acc);
             }

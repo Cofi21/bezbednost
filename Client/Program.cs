@@ -44,13 +44,13 @@ namespace Client
             Console.WriteLine("\t2 - Povlacenje sertifikata ");
             Console.WriteLine("\t3 - Izvrsenje transakcije");
             Console.WriteLine("\t4 - Reset pin koda");
+            Console.WriteLine("\t5 - Ispis naloga");
             Console.WriteLine("\t0 - Izlaz");
 
             Console.Write("Unesite Vas izbor: ");
             int izbor = Int32.Parse(Console.ReadLine());
             return izbor;
         }
-
         static void CertConnection(int operacija)
         {
             string srvCertCN = "server";
@@ -70,10 +70,8 @@ namespace Client
             {
                 try
                 {
-                    //proxy.TestCommunication();
                     if(operacija == 3)
                     { 
-                        Console.WriteLine("Certificate communication is active");
                         Console.WriteLine("Izaberite akciju: ");
                         Console.WriteLine("\t1 - Uplata novca");
                         Console.WriteLine("\t2 - Podizanje novca ");
@@ -125,8 +123,6 @@ namespace Client
 
                     }else if(operacija == 4)
                     {
-
-
                         Console.Write("Unesite broj naloga: ");
                         string brojNaloga = Console.ReadLine();
                         string pin = ResetPin(brojNaloga, secretKey);
@@ -150,7 +146,6 @@ namespace Client
                 }
             }
         }
-
         static void AuthConnection(int broj)
         {
             NetTcpBinding binding = new NetTcpBinding();
@@ -168,13 +163,9 @@ namespace Client
 
             using (ClientWin proxy = new ClientWin(binding, address))
             {
-                Console.WriteLine("Windows Authentication communication is active");
-                // Ucitavanje korisnika i naloga u inMemory bazu
                 ReadAccounts(proxy);
-                //ReadUsers(proxy);
                 try
                 {
-                    //proxy.TestCommunication();
                     switch (broj)
                     {
                         case 1:
@@ -194,10 +185,9 @@ namespace Client
                             break;
                         case 2:
                             break;
-
                         case 5:
+                            Ispis();
                             break;
-
                         case 0:
                             break;
                     }
@@ -209,7 +199,15 @@ namespace Client
                 }
             }
         }
+        public static void Ispis()
+        {
+            IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
 
+            foreach(Account acc in IMDatabase.AccountsDB.Values)
+            {
+                Console.WriteLine($"\tBroj racuna: {acc.BrojRacuna}\tStanje: {acc.Stanje}");
+            }
+        }  
         static string ReadPassword()
         {
 
@@ -241,7 +239,7 @@ namespace Client
             }
 
             return password;
-        }
+        }    
         public static Account KreirajNalog(string secretKey)
         {
             string logged = WindowsIdentity.GetCurrent().Name;
@@ -266,8 +264,7 @@ namespace Client
                 Console.WriteLine("Greska! Uneti PIN kodovi se ne poklapaju.");
                 return null;
             }
-        }
-
+        }      
         public static string ResetPin(string brojNaloga, string secretKey)
         {
             IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
@@ -312,7 +309,6 @@ namespace Client
             }
 
         }
-
         public static void ReadAccounts(ClientWin proxy)
         {                               //      return IMDatabase.AccountsDB;
             Dictionary<string, Account> AllUsersDict = proxy.ReadDict();      
@@ -324,7 +320,6 @@ namespace Client
                 }
             }
         }
-
         public static byte[] SerializeAccount(Account account)
         {
             using (MemoryStream memoryStream = new MemoryStream())
@@ -334,7 +329,6 @@ namespace Client
                 return memoryStream.ToArray();
             }
         }
-
         public static byte[] SerializeTransaction(Transaction transaction)
         {
             using (MemoryStream memoryStream = new MemoryStream())
@@ -344,22 +338,20 @@ namespace Client
                 return memoryStream.ToArray();
             }
         }
-
         public static byte[] CreateEncryptedAccount(Account account, string secretKey)
         {
             byte[] serializedAccount = SerializeAccount(account);
             return TripleDES_Symm_Algorithm.Encrypt(serializedAccount, secretKey);
-        }
+        }    
         public static byte[] CreateEncryptedPin(string pin, string secretKey)
         {
             return EncryptString(pin, secretKey);
         }
-
         public static byte[] CreateEncryptedTransaction(Transaction transaction, string secretKey)
         {
             byte[] serializedTransaction = SerializeTransaction(transaction);
             return TripleDES_Symm_Algorithm.Encrypt(serializedTransaction, secretKey);
-        }
+        }   
         public static byte[] EncryptString(string message, string secretKey)
         {
             byte[] bytesToEncrypt = Encoding.UTF8.GetBytes(message);
@@ -368,7 +360,6 @@ namespace Client
 
             return encryptedBytes;
         }
-
         public static string DecryptString(byte[] encryptedData, string secretKey)
         {
             byte[] decryptedBytes = TripleDES_Symm_Algorithm.Decrypt(encryptedData, secretKey);
@@ -378,16 +369,5 @@ namespace Client
 
             return decryptedString;
         }
-
-        /*
-
-                public static byte[] EncryptDouble(double amount, string secretKey)
-                {
-                    byte[] bytesToEncrypt = BitConverter.GetBytes(amount);
-
-                    byte[] encryptedBytes = TripleDES_Symm_Algorithm.Encrypt(bytesToEncrypt, secretKey);
-
-                    return encryptedBytes;
-                }*/
     }
 }

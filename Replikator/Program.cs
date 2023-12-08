@@ -1,4 +1,5 @@
 ﻿using Common;
+using Common.Manager;
 using Common.Models;
 using System;
 using System.Collections.Generic;
@@ -39,11 +40,6 @@ namespace Replikator
                     {
                         List<Account> accounts = izvor.Preuzmi();
                         odrediste.Posalji(accounts);
-                        /*foreach (var acc in accounts)
-                        {
-                            Console.WriteLine($"BrojRacuna: {acc.BrojRacuna}, Stanje: {acc.Stanje}, Vreme poslednje izmene: {acc.VremePoslednjeIzmene}");
-                        }
-                        Console.WriteLine("----------------------------------------");*/
 
                         Console.WriteLine("Repliciranje...");
                     }

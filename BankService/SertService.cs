@@ -22,48 +22,35 @@ namespace BankService
 
         public void TestCommunication()
         {
-
         }
-
         public bool IzdajKarticu()
         {
             throw new NotImplementedException();
         }
-
         public bool PovuciSertifikat()
         {
             throw new NotImplementedException();
         }
-
         public bool ResetujPinKod(byte[] encMess, byte[] signature)
         {
             IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
-            Console.WriteLine();
             string decMess = DecryptString(encMess, secretKey);
-            Console.WriteLine("decMess " + decMess);
             string[] parts = decMess.Split('|');
-            Console.WriteLine("parts " + parts);
             string pin = parts[0];
-            Console.WriteLine("pin" + pin);
             string brojNaloga = parts[1];
-            Console.WriteLine("broj naloga " + brojNaloga);
-            byte[] key = Convert.FromBase64String(pin);
-            string encPin = DecryptString(key, secretKey);
-            Console.WriteLine("Enc pin "+ encPin);
 
             if (ValidSignature(brojNaloga, signature))
             {
                 if (IMDatabase.AccountsDB.ContainsKey(brojNaloga.Trim()))
                 {
-                    IMDatabase.AccountsDB[brojNaloga].Pin = encPin;
+                    IMDatabase.AccountsDB[brojNaloga].Pin = pin;
                     foreach (MasterCard mc in IMDatabase.AccountsDB[brojNaloga].MasterCards)
                     {
                         if (mc.SubjectName.Equals(WindowsIdentity.GetCurrent().Name))
                         {
-                            mc.Pin = encPin;
+                            mc.Pin = pin;
                         }
                     }
-
                     Json.SaveAccountsToFile(IMDatabase.AccountsDB);
                     return true;
                 }
@@ -77,7 +64,6 @@ namespace BankService
                 return false;
             }
         }
-
         public bool IzvrsiTransakciju(byte[] transaction, byte[] signature, byte[] encPin)
         {
             try
@@ -166,7 +152,6 @@ namespace BankService
                 return false;
             }
         }
-
         public static Transaction DeserializeTransaction(byte[] data)
         {
             using (MemoryStream memoryStream = new MemoryStream(data))
@@ -190,7 +175,6 @@ namespace BankService
             if (DigitalSignature.Verify(message, HashAlgorithm.SHA1, signature, certificate)) return true;
             else return false;
         }
-
         public static string DecryptString(byte[] encryptedData, string secretKey)
         {
             byte[] decryptedBytes = TripleDES_Symm_Algorithm.Decrypt(encryptedData, secretKey);

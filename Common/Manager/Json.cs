@@ -14,7 +14,7 @@ namespace Common.Manager
 
         public static void SaveAccountsToFile(Dictionary<string, Account> accountDictionary)
         {
-            string filePath = "JsonDB/Accounts.json";
+            string filePath = "..//..//..//BankService/bin/debug/JsonDB/Accounts.json";
             string json = JsonConvert.SerializeObject(accountDictionary);
 
             File.WriteAllText(filePath, json);
@@ -22,7 +22,7 @@ namespace Common.Manager
 
         public static Dictionary<string, Account> LoadAccountsFromFile()
         {
-            string filePath = "JsonDB/Accounts.json";
+            string filePath = "..//..//..//BankService/bin/debug/JsonDB/Accounts.json";
             if (File.Exists(filePath))
             {
                 string json = File.ReadAllText(filePath);
@@ -43,10 +43,9 @@ namespace Common.Manager
             }
         }
 
-
         public static void SaveMasterCardsToFile(List<MasterCard> masterCardList)
         {
-            string filePath = "JsonDB/MasterCards.json";
+            string filePath = "..//..//..//BankService/bin/debug/JsonDB/MasterCards.json";
             string json = JsonConvert.SerializeObject(masterCardList);
 
             File.WriteAllText(filePath, json);
@@ -54,7 +53,7 @@ namespace Common.Manager
 
         public static List<MasterCard> LoadMasterCardsFromFile()
         {
-            string filePath = "JsonDB/MasterCards.json";
+            string filePath = "..//..//..//BankService/bin/debug/JsonDB/MasterCards.json";
             
             if (File.Exists(filePath))
             {
