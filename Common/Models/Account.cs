@@ -14,8 +14,6 @@ namespace Common.Models
         private string username;
         private double stanje;
         private string pin;
-        // dodato zbog replikacije
-        DateTime vremePoslednjeIzmene;
 
         [DataMember]
         public List<MasterCard> MasterCards { get; set; }
@@ -62,6 +60,11 @@ namespace Common.Models
                    username == account.username &&
                    stanje == account.stanje &&
                    pin == account.pin;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }
