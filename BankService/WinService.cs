@@ -60,7 +60,7 @@ namespace BankService
                         Json.SaveMasterCardsToFile(IMDatabase.MasterCardsDB);
 
                         // verovatno bi trebalo iz fajla da se ucita.
-                        IzdajMasterCardSertifikat(name, acc.Pin);
+                        //IzdajMasterCardSertifikat(name, acc.Pin);
                         Console.WriteLine("Uspesno");
                         return true;
                     }
