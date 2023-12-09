@@ -16,9 +16,101 @@ using System.Threading.Tasks;
 
 namespace BankService
 {
+    public class TransactionDetails
+    {
+        public int TransactionOrderNumber { get; set; }
+        public DateTime ReceivedDateTime { get; set; }
+        public double Svota { get; set; }
+    }
+
     public class SertService : ICert
     {
         private readonly string secretKey = "123456";
+        private const int _maxNumberOfTransactions = 5;
+        private const int _secondsBetweenTransactions = 120;
+        private Dictionary<string, List<TransactionDetails>> receivedTransactionsDict = new Dictionary<string, List<TransactionDetails>>();
+
+        public bool IsMaxNumberOfTransactionsExceeded(Transaction transaction, DateTime currentTime, out List<TransactionDetails> listOfTransactionDetails)
+        {
+            string accountNumber = transaction.BrojRacuna;
+
+            if (!receivedTransactionsDict.ContainsKey(accountNumber))
+            {
+                receivedTransactionsDict.Add(accountNumber,
+                    new List<TransactionDetails>()
+                    {
+                        new TransactionDetails()
+                        {
+                            TransactionOrderNumber = 1,
+                            ReceivedDateTime = currentTime,
+                            Svota = transaction.Svota
+                        }
+                    });
+
+                listOfTransactionDetails = receivedTransactionsDict[accountNumber].ToList();
+                return 1 > _maxNumberOfTransactions;
+            }
+
+            listOfTransactionDetails = receivedTransactionsDict[accountNumber];
+            if (listOfTransactionDetails.Count == 0)
+            {
+                receivedTransactionsDict[accountNumber].Add(
+                    new TransactionDetails()
+                    {
+                        TransactionOrderNumber = 1,
+                        ReceivedDateTime = currentTime,
+                        Svota = transaction.Svota
+                    });
+
+                listOfTransactionDetails = receivedTransactionsDict[accountNumber].ToList();
+                return 1 > _maxNumberOfTransactions;
+            }
+
+            DateTime timeOfFirstTransaction = listOfTransactionDetails.First().ReceivedDateTime;
+            DateTime maximumAllowedTime = timeOfFirstTransaction.AddSeconds(_secondsBetweenTransactions);
+
+            // ako je u okviru zadatog vremena
+            if (currentTime < maximumAllowedTime)
+            {
+                // sada treba proveriti da li je broj transakcija prekoracen
+                int currentNumberOfTransactionDetails = listOfTransactionDetails.Count;
+                receivedTransactionsDict[accountNumber].Add(
+                        new TransactionDetails()
+                        {
+                            TransactionOrderNumber = currentNumberOfTransactionDetails++,
+                            ReceivedDateTime = currentTime,
+                            Svota = transaction.Svota
+                        });
+
+                listOfTransactionDetails = receivedTransactionsDict[accountNumber].ToList();
+
+                if (currentNumberOfTransactionDetails > _maxNumberOfTransactions)
+                {
+                    receivedTransactionsDict[accountNumber].Clear(); // ostaje kljuc u dict, ali se lista prazni
+                    return true; // prekoraceno, cisti se lista i vraca true;
+                }
+                else
+                {
+                    return false; // nije prekoraceno, samo vrati false;
+                }
+            }
+            else
+            {
+                // u ovaj deo koda ulazi jer je vreme isteklo, sada treba resetovati listu i ponovo dodavati elemente
+                receivedTransactionsDict[accountNumber].Clear();
+
+                receivedTransactionsDict[accountNumber].Add(
+                    new TransactionDetails()
+                    {
+                        TransactionOrderNumber = 1,
+                        ReceivedDateTime = currentTime,
+                        Svota = transaction.Svota
+                    });
+
+                listOfTransactionDetails = receivedTransactionsDict[accountNumber].ToList();
+                return 1 > _maxNumberOfTransactions;
+            }
+        }
 
         public void TestCommunication()
         {
@@ -68,6 +160,8 @@ namespace BankService
         {
             try
             {
+                DateTime currentTime = DateTime.UtcNow;
+
                 IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
                 IMDatabase.MasterCardsDB = Json.LoadMasterCardsFromFile();
 
@@ -81,6 +175,18 @@ namespace BankService
                     {
                         if (IMDatabase.AccountsDB.ContainsKey(decTrans.BrojRacuna))
                         {
+                            // proveriti jel ovo okej mesto ili treba samo ako je pin tacan.
+                            if (IsMaxNumberOfTransactionsExceeded(decTrans, currentTime, out List<TransactionDetails> listOfTransactionDetails))
+                            {
+                                //string BankName -> ne znam sta je ovo tacno
+                                //string AccountName -> ovo imas to je decTrans.BrojRacuna
+                                //DateTime TimeOfDetection -> to vec imas, to je currentTime
+                                //List<TransactionDetails> NumberOfTransactions -> to vec imas, to je listOfTransactionDetails
+
+                                // spakuj sve ovo u jedan objekat i posalji ga AuditLog projektu gde ces dodati jedan red u output txt file za ove detalje
+                            }
+
+
                             byte[] key = Convert.FromBase64String(IMDatabase.AccountsDB[decTrans.BrojRacuna].Pin);
                             string keyPin = DecryptString(key, secretKey);
 
