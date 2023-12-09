@@ -172,8 +172,8 @@ namespace Client
                             Account acc = KreirajNalog(secretKey);
                             if (acc == null) Console.WriteLine("Nalog je null");
                             byte[] account = CreateEncryptedAccount(acc, secretKey);
-                            byte[] signature = DigitalSignature.Create(account.ToString(), Manager.HashAlgorithm.SHA1, certificateSign);
-
+                            //byte[] signature = DigitalSignature.Create(account.ToString(), Manager.HashAlgorithm.SHA1, certificateSign);
+                            byte[] signature = null;
                             if (proxy.KreirajNalog(account, signature))
                             {
                                 Console.WriteLine("Cestitamo! Uspesno ste kreirali nalog!");
@@ -272,7 +272,7 @@ namespace Client
             {
                 Console.Write("Unesite stari Pin: ");
                 string stariPin = ReadPassword();
-                string pinCode = string.Empty;
+                string pinCode;
 
                 byte[] key = Convert.FromBase64String(IMDatabase.AccountsDB[brojNaloga].Pin);
                 string keyPin = DecryptString(key, secretKey);

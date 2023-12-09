@@ -18,7 +18,7 @@ namespace BankService
 {
     public class SertService : ICert
     {
-        private string secretKey = "123456";
+        private readonly string secretKey = "123456";
 
         public void TestCommunication()
         {

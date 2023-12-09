@@ -18,6 +18,8 @@ namespace Common
         [OperationContract]
         bool KreirajNalog(byte[] recievedData, byte[] signature);
 
+        [OperationContract]
+        bool IzdajMasterCardSertifikat(string name, string pin);
 
         [OperationContract]
         bool PovuciSertifikat();

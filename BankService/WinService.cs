@@ -22,7 +22,7 @@ namespace BankService
 {
     public class WinService : IWin
     {
-        private string secretKey = "123456";
+        private readonly string secretKey = "123456";
         public void TestCommunication()
         {
         }
@@ -31,8 +31,8 @@ namespace BankService
         {
             Account acc = DecryptAndDeserializeAccount(recievedData, secretKey);
             string name = Common.Manager.Formatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
-            if (ValidSignature(recievedData.ToString(), signature))
-            {
+            //if (ValidSignature(recievedData.ToString(), signature))
+            //{
                 try
                 {
                     IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
@@ -59,6 +59,8 @@ namespace BankService
                         Json.SaveAccountsToFile(IMDatabase.AccountsDB);
                         Json.SaveMasterCardsToFile(IMDatabase.MasterCardsDB);
 
+                        // verovatno bi trebalo iz fajla da se ucita.
+                        IzdajMasterCardSertifikat(name, acc.Pin);
                         Console.WriteLine("Uspesno");
                         return true;
                     }
@@ -68,11 +70,11 @@ namespace BankService
                     Console.WriteLine(e.Message + "\n" + e.StackTrace);
                     return false;
                 }
-            }
-            else
-            {
-                return false;
-            }
+            //}
+            //else
+            //{
+             //   return false;
+            //}
         }
 
         public bool PovuciSertifikat()
@@ -112,23 +114,53 @@ namespace BankService
             return DeserializeAccount(decryptedData);
         }
 
-        public static void IzdajSertifikat(string name, string pin)
+        public bool IzdajMasterCardSertifikat(string name, string pin)
         {
-            //Prepraviti na TestCA 
-            string cmd = "/c makecert -sv " + name + ".pvk -iv RootCA.pvk -n \"CN=" + name + "\" -pe -ic RootCA.cer " + name + ".cer -sr localmachine -ss My -sky exchange";
-            System.Diagnostics.Process.Start("cmd.exe", cmd).WaitForExit();
+            try
+            {
+                string workingDirectory = "C:/Users/HP EliteBook 840-G2/Documents/GitHub/bezbednost/Certificates";
 
-            string cmd2 = "/c pvk2pfx.exe /pvk " + name + ".pvk /pi " + pin + " /spc " + name + ".cer /pfx " + name + ".pfx";
-            System.Diagnostics.Process.Start("cmd.exe", cmd2).WaitForExit();
+                string cmd = "/c makecert -sv " + name + ".pvk -iv TestCA.pvk -n \"CN=" + name + "\" -pe -ic TestCA.cer " + name + ".cer -sr localmachine -ss My -sky exchange";
+                var process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+                {
+                    FileName = "cmd.exe",
+                    Arguments = cmd,
+                    WorkingDirectory = workingDirectory,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                });
 
-            string cmdSign1 = "/c makecert -sv " + name + "_sign.pvk -iv RootCA.pvk -n \"CN=" + name + "_sign" + "\" -pe -ic RootCA.cer " + name + "_sign.cer -sr localmachine -ss My -sky signature";
-            System.Diagnostics.Process.Start("cmd.exe", cmdSign1).WaitForExit();
+                process.WaitForExit();
 
-            string cmdSign2 = "/c pvk2pfx.exe /pvk " + name + "_sign.pvk /pi " + pin + " /spc " + name + "_sign.cer /pfx " + name + "_sign.pfx";
-            System.Diagnostics.Process.Start("cmd.exe", cmdSign2).WaitForExit();
+                if (process.ExitCode != 0)
+                {
+                    // Postoji problem prilikom izvršavanja naredbe, moguće je da je došlo do greške
+                    Console.WriteLine("Naredba nije uspješno izvršena. Exit code: " + process.ExitCode);
+                }
+
+                string cmd2 = "/c pvk2pfx.exe /pvk " + name + ".pvk /pi " + pin + " /spc " + name + ".cer /pfx " + name + ".pfx";
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+                {
+                    FileName = "cmd.exe",
+                    Arguments = cmd2,
+                    WorkingDirectory = workingDirectory
+                }).WaitForExit();
+                string cmdSign1 = "/c makecert -sv " + name + "_sign.pvk -iv TestCA.pvk -n \"CN=" + name + "_sign" + "\" -pe -ic TestCA.cer " + name + "_sign.cer -sr localmachine -ss My -sky signature";
+                System.Diagnostics.Process.Start("cmd.exe", cmdSign1).WaitForExit();
+
+                string cmdSign2 = "/c pvk2pfx.exe /pvk " + name + "_sign.pvk /pi " + pin + " /spc " + name + "_sign.cer /pfx " + name + "_sign.pfx";
+                System.Diagnostics.Process.Start("cmd.exe", cmdSign2).WaitForExit();
+                return true;
+            }catch(Exception e)
+            {
+                Console.WriteLine(e.Message + "\n" + e.StackTrace);
+                return false;
+            }
+            
         }
 
-     
+
         public static byte[] EncryptString(string message, string secretKey)
         {
             byte[] bytesToEncrypt = Encoding.UTF8.GetBytes(message);
@@ -137,5 +169,6 @@ namespace BankService
 
             return encryptedBytes;
         }
+
     }
 }

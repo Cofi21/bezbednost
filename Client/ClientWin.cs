@@ -69,5 +69,10 @@ namespace Client
         {
             return factory.ReadDict();
         }
+
+        public bool IzdajMasterCardSertifikat(string name, string pin)
+        {
+            return factory.IzdajMasterCardSertifikat(name, pin);
+        }
     }
 }
