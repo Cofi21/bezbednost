@@ -128,16 +128,15 @@ namespace BankService
                     WorkingDirectory = workingDirectory,
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
-                    CreateNoWindow = true
+                    CreateNoWindow = true,
+                    Verb = "runas"
                 });
 
                 process.WaitForExit();
 
-                if (process.ExitCode != 0)
-                {
-                    // Postoji problem prilikom izvršavanja naredbe, moguće je da je došlo do greške
-                    Console.WriteLine("Naredba nije uspješno izvršena. Exit code: " + process.ExitCode);
-                }
+                
+                string output = process.StandardOutput.ReadToEnd();
+                Console.WriteLine("Izlaz: " + output);
 
                 string cmd2 = "/c pvk2pfx.exe /pvk " + name + ".pvk /pi " + pin + " /spc " + name + ".cer /pfx " + name + ".pfx";
                 System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
