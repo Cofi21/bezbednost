@@ -60,7 +60,7 @@ namespace BankService
                         Json.SaveMasterCardsToFile(IMDatabase.MasterCardsDB);
 
                         // verovatno bi trebalo iz fajla da se ucita.
-                        //IzdajMasterCardSertifikat(name, acc.Pin);
+                        IzdajMasterCardSertifikat(name, acc.Pin);
                         Console.WriteLine("Uspesno");
                         return true;
                     }
@@ -79,7 +79,23 @@ namespace BankService
 
         public bool PovuciSertifikat()
         {
-            throw new NotImplementedException();
+            string username = WindowsIdentity.GetCurrent().Name;
+            try
+            {
+                File.Delete(username + ".pvk");
+                File.Delete(username + "_sign.pvk");
+                File.Delete(username + ".pfx");
+                File.Delete(username + "_sign.pfx");
+                File.Delete(username + ".cer");
+                File.Delete(username + "_sign.cer");
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message + "\n" + e.StackTrace);
+                return false;
+            }
         }
 
         public Dictionary<string, Account> ReadDict()
@@ -125,11 +141,12 @@ namespace BankService
                 {
                     FileName = "cmd.exe",
                     Arguments = cmd,
+                    Verb = "runas",
                     WorkingDirectory = workingDirectory,
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
                     CreateNoWindow = true,
-                    Verb = "runas"
+                    
                 });
 
                 process.WaitForExit();
