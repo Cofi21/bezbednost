@@ -55,6 +55,7 @@
     <Compile Include="Manager\Formatter.cs" />
     <Compile Include="Manager\Json.cs" />
     <Compile Include="Manager\SecretKey.cs" />
+    <Compile Include="Manager\TransactionDetails.cs" />
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\MasterCard.cs" />
     <Compile Include="Models\Transaction.cs" />

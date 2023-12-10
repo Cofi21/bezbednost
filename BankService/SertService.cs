@@ -16,13 +16,6 @@ using System.Threading.Tasks;
 
 namespace BankService
 {
-    public class TransactionDetails
-    {
-        public int TransactionOrderNumber { get; set; }
-        public DateTime ReceivedDateTime { get; set; }
-        public double Svota { get; set; }
-    }
-
     public class SertService : ICert
     {
         private readonly string secretKey = "123456";
@@ -86,7 +79,6 @@ namespace BankService
 
                 if (currentNumberOfTransactionDetails > _maxNumberOfTransactions)
                 {
-                    receivedTransactionsDict[accountNumber].Clear(); // ostaje kljuc u dict, ali se lista prazni
                     return true; // prekoraceno, cisti se lista i vraca true;
                 }
                 else
@@ -176,15 +168,10 @@ namespace BankService
                         if (IMDatabase.AccountsDB.ContainsKey(decTrans.BrojRacuna))
                         {
                             // proveriti jel ovo okej mesto ili treba samo ako je pin tacan.
-                            if (IsMaxNumberOfTransactionsExceeded(decTrans, currentTime, out List<TransactionDetails> listOfTransactionDetails))
-                            {
-                                //string BankName -> ne znam sta je ovo tacno
-                                //string AccountName -> ovo imas to je decTrans.BrojRacuna
-                                //DateTime TimeOfDetection -> to vec imas, to je currentTime
-                                //List<TransactionDetails> NumberOfTransactions -> to vec imas, to je listOfTransactionDetails
-
-                                // spakuj sve ovo u jedan objekat i posalji ga AuditLog projektu gde ces dodati jedan red u output txt file za ove detalje
-                            }
+                            //if (IsMaxNumberOfTransactionsExceeded(decTrans, currentTime, out List<TransactionDetails> listOfTransactionDetails))
+                            //{
+                                
+                            //}
 
 
                             byte[] key = Convert.FromBase64String(IMDatabase.AccountsDB[decTrans.BrojRacuna].Pin);
