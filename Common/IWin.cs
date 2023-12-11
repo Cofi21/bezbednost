@@ -22,7 +22,7 @@ namespace Common
         bool IzdajMasterCardSertifikat(string name, string pin);
 
         [OperationContract]
-        bool PovuciSertifikat();
+        bool PovuciSertifikat(string name);
 
 
         [OperationContract]

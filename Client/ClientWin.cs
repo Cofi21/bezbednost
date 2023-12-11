@@ -60,9 +60,9 @@ namespace Client
             }
         }
 
-        public bool PovuciSertifikat()
+        public bool PovuciSertifikat(string name)
         {
-            return factory.PovuciSertifikat();
+            return factory.PovuciSertifikat(name);
         }
 
         public Dictionary<string, Account> ReadDict()

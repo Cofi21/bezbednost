@@ -27,10 +27,13 @@ namespace BankService
         {
         }
 
+
+
         public bool KreirajNalog(byte[] recievedData, byte[] signature)
         {
             Account acc = DecryptAndDeserializeAccount(recievedData, secretKey);
             string name = Common.Manager.Formatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
+            Registracija();
             //if (ValidSignature(recievedData.ToString(), signature))
             //{
                 try
@@ -56,12 +59,22 @@ namespace BankService
                         IMDatabase.MasterCardsDB.Add(mc);
                         IMDatabase.AccountsDB.Add(acc.BrojRacuna, acc);
 
+
+                        if (!IMDatabase.UsersDB[name].HaveCertificate && IzdajMasterCardSertifikat(name, acc.Pin))
+                        {
+                            IMDatabase.UsersDB[name].HaveCertificate = true;
+                            Console.WriteLine("Korisniku je uspesno dodeljen sertifikat");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Korisnik vec ima sertifikat");
+                        }
+
+                        Json.SaveUsersToFile(IMDatabase.UsersDB);
                         Json.SaveAccountsToFile(IMDatabase.AccountsDB);
                         Json.SaveMasterCardsToFile(IMDatabase.MasterCardsDB);
 
-                        // verovatno bi trebalo iz fajla da se ucita.
-                        IzdajMasterCardSertifikat(name, acc.Pin);
-                        Console.WriteLine("Uspesno");
+                        Console.WriteLine("Uspesno kreiranje naloga!");
                         return true;
                     }
                 }
@@ -77,26 +90,7 @@ namespace BankService
             //}
         }
 
-        public bool PovuciSertifikat()
-        {
-            string username = WindowsIdentity.GetCurrent().Name;
-            try
-            {
-                File.Delete(username + ".pvk");
-                File.Delete(username + "_sign.pvk");
-                File.Delete(username + ".pfx");
-                File.Delete(username + "_sign.pfx");
-                File.Delete(username + ".cer");
-                File.Delete(username + "_sign.cer");
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message + "\n" + e.StackTrace);
-                return false;
-            }
-        }
+        
 
         public Dictionary<string, Account> ReadDict()
         {
@@ -134,7 +128,7 @@ namespace BankService
         {
             try
             {
-                string workingDirectory = "C:/Users/HP EliteBook 840-G2/Documents/GitHub/bezbednost/Certificates";
+                string workingDirectory = "..//..//..//Certificates";
 
                 string cmd = "/c makecert -sv " + name + ".pvk -iv TestCA.pvk -n \"CN=" + name + "\" -pe -ic TestCA.cer " + name + ".cer -sr localmachine -ss My -sky exchange";
                 var process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
@@ -153,20 +147,47 @@ namespace BankService
 
                 
                 string output = process.StandardOutput.ReadToEnd();
-                Console.WriteLine("Izlaz: " + output);
+                Console.WriteLine("Makecert izlaz: " + output);
 
                 string cmd2 = "/c pvk2pfx.exe /pvk " + name + ".pvk /pi " + pin + " /spc " + name + ".cer /pfx " + name + ".pfx";
-                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+                var process2 = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
                 {
                     FileName = "cmd.exe",
                     Arguments = cmd2,
                     WorkingDirectory = workingDirectory
-                }).WaitForExit();
+                });
+
+                process2.WaitForExit();
+
+                string output2 = process.StandardOutput.ReadToEnd();
+                Console.WriteLine("pfx izlaz:" + output2);
+
+
                 string cmdSign1 = "/c makecert -sv " + name + "_sign.pvk -iv TestCA.pvk -n \"CN=" + name + "_sign" + "\" -pe -ic TestCA.cer " + name + "_sign.cer -sr localmachine -ss My -sky signature";
-                System.Diagnostics.Process.Start("cmd.exe", cmdSign1).WaitForExit();
+                var process3 = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+                {
+                    FileName = "cmd.exe",
+                    Arguments = cmdSign1,
+                    WorkingDirectory = workingDirectory
+                });
+
+                process3.WaitForExit();
+
+                string output3 = process.StandardOutput.ReadToEnd();
+                Console.WriteLine("Sign1 izlaz: " + output3);
 
                 string cmdSign2 = "/c pvk2pfx.exe /pvk " + name + "_sign.pvk /pi " + pin + " /spc " + name + "_sign.cer /pfx " + name + "_sign.pfx";
-                System.Diagnostics.Process.Start("cmd.exe", cmdSign2).WaitForExit();
+                var process4 = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+                {
+                    FileName = "cmd.exe",
+                    Arguments = cmdSign2,
+                    WorkingDirectory = workingDirectory
+                });
+
+                process4.WaitForExit();
+
+                string output4 = process.StandardOutput.ReadToEnd();
+                Console.WriteLine("Sign1 izlaz: " + output4);
                 return true;
             }catch(Exception e)
             {
@@ -176,6 +197,30 @@ namespace BankService
             
         }
 
+        public bool PovuciSertifikat(string username)
+        {
+            Registracija();
+            try
+            {
+                string path = "..//..//..//Certificates";
+                File.Delete(Path.Combine(path, username + ".pvk"));
+                File.Delete(Path.Combine(path, username + "_sign.pvk"));
+                File.Delete(Path.Combine(path, username + ".pfx"));
+                File.Delete(Path.Combine(path, username + "_sign.pfx"));
+                File.Delete(Path.Combine(path, username + ".cer"));
+                File.Delete(Path.Combine(path, username + "_sign.cer"));
+
+
+                IMDatabase.UsersDB[username].HaveCertificate = false;
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message + "\n" + e.StackTrace);
+                return false;
+            }
+        }
 
         public static byte[] EncryptString(string message, string secretKey)
         {
@@ -186,5 +231,20 @@ namespace BankService
             return encryptedBytes;
         }
 
+        public static bool Registracija()
+        {
+            IMDatabase.UsersDB = Json.LoadUsersFromFile();
+            string name = Common.Manager.Formatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
+            if (!IMDatabase.UsersDB.ContainsKey(name))
+            {
+                IMDatabase.UsersDB.Add(name, new User(name, false));
+                Json.SaveUsersToFile(IMDatabase.UsersDB);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }

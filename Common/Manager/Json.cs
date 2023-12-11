@@ -75,5 +75,36 @@ namespace Common.Manager
             }
         }
 
+        public static void SaveUsersToFile(Dictionary<string, User> userDictionary)
+        {
+            string filePath = "..//..//..//BankService/bin/debug/JsonDB/Users.json";
+            string json = JsonConvert.SerializeObject(userDictionary);
+
+            File.WriteAllText(filePath, json);
+        }
+
+        public static Dictionary<string, User> LoadUsersFromFile()
+        {
+            string filePath = "..//..//..//BankService/bin/debug/JsonDB/Users.json";
+            if (File.Exists(filePath))
+            {
+                string json = File.ReadAllText(filePath);
+
+                if (!string.IsNullOrWhiteSpace(json))
+                {
+                    Dictionary<string, User> userDictionary = JsonConvert.DeserializeObject<Dictionary<string, User>>(json);
+                    return userDictionary;
+                }
+                else
+                {
+                    return new Dictionary<string, User>();
+                }
+            }
+            else
+            {
+                throw new FileNotFoundException("File does not exist.");
+            }
+        }
+
     }
 }

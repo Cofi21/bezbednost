@@ -184,6 +184,14 @@ namespace Client
                             }
                             break;
                         case 2:
+                            string logged = WindowsIdentity.GetCurrent().Name;
+                            string[] parts = logged.Split('\\');
+                            string username = parts[1];
+                            Console.WriteLine("Povlacenje sertifikata za korisnika: " + username);
+                            if (proxy.PovuciSertifikat(username))
+                                Console.WriteLine("Sertifikat je uspesno izbrisan!");
+                            else
+                                Console.WriteLine("Greska! Sertifikat nije obrisan!");
                             break;
                         case 5:
                             Ispis();
