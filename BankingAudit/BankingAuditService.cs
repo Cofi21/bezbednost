@@ -14,28 +14,29 @@ namespace BankingAudit
     {
         public void AccessingLog(Audit audit)
         {
-            string fileInput = "Bank name: " + audit.BankName + "\n";
+            string fileInput = string.Empty;
+            fileInput += "\n---------------------------------------------------------------\n";
+            fileInput += "Bank name: " + audit.BankName + "\n";
             fileInput += "Account name: " + audit.AccountName + "\n";
-            fileInput += "Time of Detection: " + audit.TimeOfDetection + "\n";
+            fileInput += "Time of Detection: " + audit.TimeOfDetection.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
+            fileInput += "Transactions:";
             string numberOfTransactions;
 
             foreach (TransactionDetails td in audit.TransactionsList)
             {
                 numberOfTransactions = Regex.Match(td.ToString(), @"\d+").Value;
 
-                fileInput += "Broj transakcija: " + numberOfTransactions + "\n";
-                fileInput += "---------------------------------------\n";
+                fileInput += "\n\n\tTransaction: " + td.TransactionOrderNumber;
+                fileInput += "\n\tReceived Time: " + td.ReceivedDateTime.ToString("dd.MM.yyyy HH:mm:ss");
+                fileInput += "\n\tAmmount: " + td.Svota;
             }
 
-            Console.WriteLine(fileInput);
+            fileInput += "\n---------------------------------------------------------------\n";
 
-            string path = "..\\..\\LogFile.txt";
-
-            using (StreamWriter sw = new StreamWriter(path, true))
+            using (StreamWriter sw = new StreamWriter("..\\..\\LogFile.txt", true))
             {
                 sw.WriteLine(fileInput);
             }
-
         }
     }
 }
