@@ -12,12 +12,13 @@ using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceModel;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BankService
 {
     public class SertService : ICert
     {
+        IBankingAudit factory;
+
         private readonly string secretKey = "123456";
         private const int _maxNumberOfTransactions = 5;
         private const int _secondsBetweenTransactions = 120;
@@ -89,7 +90,12 @@ namespace BankService
             else
             {
                 // u ovaj deo koda ulazi jer je vreme isteklo, sada treba resetovati listu i ponovo dodavati elemente
-                receivedTransactionsDict[accountNumber].Clear();
+                //receivedTransactionsDict[accountNumber].Clear();
+
+                // obrisi sve elemente ciji je received time manji od trenutnog vremena za _secondsBetweenTransactions od toga
+                receivedTransactionsDict[accountNumber] = receivedTransactionsDict[accountNumber]
+                    .Where(x => x.ReceivedDateTime.AddSeconds(_secondsBetweenTransactions) >= currentTime)
+                    .ToList();
 
                 receivedTransactionsDict[accountNumber].Add(
                     new TransactionDetails()
@@ -168,10 +174,19 @@ namespace BankService
                         if (IMDatabase.AccountsDB.ContainsKey(decTrans.BrojRacuna))
                         {
                             // proveriti jel ovo okej mesto ili treba samo ako je pin tacan.
-                            //if (IsMaxNumberOfTransactionsExceeded(decTrans, currentTime, out List<TransactionDetails> listOfTransactionDetails))
-                            //{
-                                
-                            //}
+                            if (IsMaxNumberOfTransactionsExceeded(decTrans, currentTime, out List<TransactionDetails> listOfTransactionDetails))
+                            {
+                                Audit audit = new Audit()
+                                {
+                                    BankName = "BankName",
+                                    AccountName = decTrans.BrojRacuna,
+                                    TimeOfDetection = currentTime,
+                                    TransactionsList = listOfTransactionDetails
+                                };
+
+                                factory.AccessingLog(audit);
+
+                            }
 
 
                             byte[] key = Convert.FromBase64String(IMDatabase.AccountsDB[decTrans.BrojRacuna].Pin);

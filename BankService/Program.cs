@@ -1,17 +1,11 @@
-﻿using Common;
+﻿using BankingAudit;
+using Common;
 using Common.Manager;
-using Common.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceModel;
 using System.ServiceModel.Security;
-using System.Text;
-using System.Threading.Tasks;
-using SymmetricAlgorithms;
 
 namespace BankService
 {
@@ -54,6 +48,16 @@ namespace BankService
             hostWinRep.AddServiceEndpoint(typeof(IReplikator), bindingWinRep, addressWinRep);
             #endregion
 
+            #region BankingAudit
+            NetTcpBinding bindingAudit = new NetTcpBinding();
+            string bankAuditAddress = "net.tcp://localhost:4003/BankingAuditService";
+            bindingAudit.Security.Mode = SecurityMode.Transport;
+            bindingAudit.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
+            bindingAudit.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
+            ServiceHost hostWinBankingAudit = new ServiceHost(typeof(BankingAuditService));
+            hostWinBankingAudit.AddServiceEndpoint(typeof(IBankingAudit), bindingAudit, bankAuditAddress);
+            #endregion
+
             try
             {
                 hostWin.Open();
@@ -64,6 +68,9 @@ namespace BankService
 
                 hostWinRep.Open();
                 Console.WriteLine("Replikator server");
+
+                hostWinBankingAudit.Open();
+                Console.WriteLine("Banking Audit server");
 
                 Console.ReadKey(); 
             }
@@ -77,6 +84,7 @@ namespace BankService
                 hostCert.Close();
                 hostWin.Close();
                 hostWinRep.Close();
+                hostWinBankingAudit.Close();
             }
         }
     }

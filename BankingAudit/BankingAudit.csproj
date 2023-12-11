@@ -4,16 +4,17 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{18B23901-ADF8-45CD-A92D-1AEF830DF599}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Common</RootNamespace>
-    <AssemblyName>Common</AssemblyName>
+    <ProjectGuid>{AD1EF1C6-8358-47E8-BA16-807C1F1E3ED2}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>BankingAudit</RootNamespace>
+    <AssemblyName>BankingAudit</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,6 +24,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -31,11 +33,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.IdentityModel" />
-    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -45,24 +44,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="3DES_Symm_Algorithm.cs" />
-    <Compile Include="IBankingAudit.cs" />
-    <Compile Include="ICert.cs" />
-    <Compile Include="IMDatabase.cs" />
-    <Compile Include="IReplikator.cs" />
-    <Compile Include="IWin.cs" />
-    <Compile Include="Manager\Audit.cs" />
-    <Compile Include="Manager\CertManager.cs" />
-    <Compile Include="Manager\DigitalSignature.cs" />
-    <Compile Include="Manager\Formatter.cs" />
-    <Compile Include="Manager\Json.cs" />
-    <Compile Include="Manager\SecretKey.cs" />
-    <Compile Include="Manager\TransactionDetails.cs" />
-    <Compile Include="Models\Account.cs" />
-    <Compile Include="Models\MasterCard.cs" />
-    <Compile Include="Models\Transaction.cs" />
-    <Compile Include="Models\User.cs" />
+    <Compile Include="BankingAuditService.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj">
+      <Project>{18B23901-ADF8-45CD-A92D-1AEF830DF599}</Project>
+      <Name>Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

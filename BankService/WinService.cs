@@ -60,17 +60,17 @@ namespace BankService
                         IMDatabase.AccountsDB.Add(acc.BrojRacuna, acc);
 
 
-                        if (!IMDatabase.UsersDB[name].HaveCertificate && IzdajMasterCardSertifikat(name, acc.Pin))
-                        {
-                            IMDatabase.UsersDB[name].HaveCertificate = true;
-                            Console.WriteLine("Korisniku je uspesno dodeljen sertifikat");
-                        }
-                        else
-                        {
-                            Console.WriteLine("Korisnik vec ima sertifikat");
-                        }
+                    if (!IMDatabase.UsersDB[name].HaveCertificate && IzdajMasterCardSertifikat(name, acc.Pin))
+                    {
+                        IMDatabase.UsersDB[name].HaveCertificate = true;
+                        Console.WriteLine("Korisniku je uspesno dodeljen sertifikat");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Korisnik vec ima sertifikat");
+                    }
 
-                        Json.SaveUsersToFile(IMDatabase.UsersDB);
+                    Json.SaveUsersToFile(IMDatabase.UsersDB);
                         Json.SaveAccountsToFile(IMDatabase.AccountsDB);
                         Json.SaveMasterCardsToFile(IMDatabase.MasterCardsDB);
 

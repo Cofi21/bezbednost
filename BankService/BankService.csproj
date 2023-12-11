@@ -57,6 +57,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BankingAudit\BankingAudit.csproj">
+      <Project>{ad1ef1c6-8358-47e8-ba16-807c1f1e3ed2}</Project>
+      <Name>BankingAudit</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Common\Common.csproj">
       <Project>{18b23901-adf8-45cd-a92d-1aef830df599}</Project>
       <Name>Common</Name>

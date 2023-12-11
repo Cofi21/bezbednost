@@ -69,9 +69,9 @@ namespace Client
         {
             try
             {
-
                 return factory.IzvrsiTransakciju(transaction, signature, encPin);
-            }catch(Exception e)
+            }
+            catch(Exception e)
             {
                 Console.WriteLine(e.Message);
                 return false;
