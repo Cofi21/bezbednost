@@ -17,9 +17,10 @@ namespace BankService
 {
     public class SertService : ICert
     {
-        IBankingAudit factory;
+        //IBankingAudit factory;
 
-        private readonly string secretKey = "123456";
+        private static string clientName = Common.Manager.Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name);
+        private static string secretKey = SecretKey.LoadKey(clientName);
         private const int _maxNumberOfTransactions = 5;
         private const int _secondsBetweenTransactions = 120;
         private Dictionary<string, List<TransactionDetails>> receivedTransactionsDict = new Dictionary<string, List<TransactionDetails>>();
@@ -80,7 +81,7 @@ namespace BankService
                                     TransactionsList = listOfTransactionDetails
                                 };
 
-                                factory.AccessingLog(audit);
+                                //factory.AccessingLog(audit);
 
                             }
 
@@ -149,7 +150,7 @@ namespace BankService
             }
             catch(Exception e)
             {
-                Console.WriteLine("greska "+ e.Message);
+                Console.WriteLine("greska "+ e.Message + "\n" + e.StackTrace);
                 return false;
             }
         }

@@ -54,7 +54,12 @@ namespace Client
         static void CertConnection(int operation)
         {
             string srvCertCN = "server";
-            string secretKey = "123456";
+
+            string logged = WindowsIdentity.GetCurrent().Name;
+            string[] parts = logged.Split('\\');
+            string username = parts[1];
+            string secretKey = SecretKey.GenerateKey();
+            SecretKey.StoreKey(secretKey, username);
 
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
@@ -151,7 +156,12 @@ namespace Client
             NetTcpBinding binding = new NetTcpBinding();
             string address = "net.tcp://localhost:4000/WinService";
 
-            string secretKey = "123456";
+            string logged = WindowsIdentity.GetCurrent().Name;
+            string[] parts = logged.Split('\\');
+            string username = parts[1];
+            string secretKey = SecretKey.GenerateKey();
+            SecretKey.StoreKey(secretKey, username);
+
             IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
 
             binding.Security.Mode = SecurityMode.Transport;
@@ -186,9 +196,6 @@ namespace Client
                             }
                             break;
                         case 2:
-                            string logged = WindowsIdentity.GetCurrent().Name;
-                            string[] parts = logged.Split('\\');
-                            string username = parts[1];
                             Console.WriteLine("Povlacenje sertifikata za korisnika: " + username);
                             if (proxy.PullAndCreateCertificate(username))
                                 Console.WriteLine("Sertifikat je uspesno izbrisan!");

@@ -22,13 +22,14 @@ namespace BankService
 {
     public class WinService : IWin
     {
-        private readonly string secretKey = "123456";
+        private static string secretKey;
+        
 
         public bool CreateAccount(byte[] recievedData, byte[] signature)
         {
+            Registration();
             Account acc = DecryptAndDeserializeAccount(recievedData, secretKey);
             string name = Common.Manager.Formatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
-            Registration();
             if (ValidSignature(recievedData.ToString(), signature))
             {
                 try
@@ -201,16 +202,25 @@ namespace BankService
         {
             IMDatabase.UsersDB = Json.LoadUsersFromFile();
             string name = Common.Manager.Formatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
+            try
+            {
+                secretKey = SecretKey.LoadKey(name);
+            }catch(Exception e)
+            {
+                Console.WriteLine(e.Message + "\n" + e.StackTrace);
+            }
             if (!IMDatabase.UsersDB.ContainsKey(name))
             {
                 IMDatabase.UsersDB.Add(name, new User(name, false));
                 Json.SaveUsersToFile(IMDatabase.UsersDB);
+                
                 return true;
             }
             else
             {
                 return false;
             }
+
         }
 
         public static string DecryptString(byte[] encryptedData, string secretKey)
