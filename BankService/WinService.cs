@@ -111,13 +111,11 @@ namespace BankService
             try
             {
                 string workingDirectory = "..//..//..//Certificates";
-
                 string cmd = "/c makecert -sv " + name + ".pvk -iv TestCA.pvk -n \"CN=" + name + "\" -pe -ic TestCA.cer " + name + ".cer -sr localmachine -ss My -sky exchange";
                 var process = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
                 {
                     FileName = "cmd.exe",
                     Arguments = cmd,
-                    Verb = "runas",
                     WorkingDirectory = workingDirectory,
                     RedirectStandardOutput = true,
                     UseShellExecute = false,
@@ -130,46 +128,32 @@ namespace BankService
                 
                 string output = process.StandardOutput.ReadToEnd();
                 Console.WriteLine("Makecert izlaz: " + output);
-
-                string cmd2 = "/c pvk2pfx.exe /pvk " + name + ".pvk /pi " + pin + " /spc " + name + ".cer /pfx " + name + ".pfx";
+                string pin1;
+                if (!int.TryParse(pin, out int num))
+                {
+                    byte[] key = Convert.FromBase64String(pin);
+                    pin1 = DecryptString(key, secretKey);
+                }
+                else
+                   pin1 = pin;
+                string cmd2 = "/c pvk2pfx.exe /pvk " + name + ".pvk /pi " + pin1 + " /spc " + name + ".cer /pfx " + name + ".pfx";
+                Console.WriteLine(cmd2);
                 var process2 = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
                 {
                     FileName = "cmd.exe",
                     Arguments = cmd2,
-                    WorkingDirectory = workingDirectory
+                    WorkingDirectory = workingDirectory,
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
                 });
 
                 process2.WaitForExit();
 
-                string output2 = process.StandardOutput.ReadToEnd();
+                string output2 = process2.StandardOutput.ReadToEnd();
                 Console.WriteLine("pfx izlaz:" + output2);
 
-
-                string cmdSign1 = "/c makecert -sv " + name + "_sign.pvk -iv TestCA.pvk -n \"CN=" + name + "_sign" + "\" -pe -ic TestCA.cer " + name + "_sign.cer -sr localmachine -ss My -sky signature";
-                var process3 = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
-                {
-                    FileName = "cmd.exe",
-                    Arguments = cmdSign1,
-                    WorkingDirectory = workingDirectory
-                });
-
-                process3.WaitForExit();
-
-                string output3 = process.StandardOutput.ReadToEnd();
-                Console.WriteLine("Sign1 izlaz: " + output3);
-
-                string cmdSign2 = "/c pvk2pfx.exe /pvk " + name + "_sign.pvk /pi " + pin + " /spc " + name + "_sign.cer /pfx " + name + "_sign.pfx";
-                var process4 = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
-                {
-                    FileName = "cmd.exe",
-                    Arguments = cmdSign2,
-                    WorkingDirectory = workingDirectory
-                });
-
-                process4.WaitForExit();
-
-                string output4 = process.StandardOutput.ReadToEnd();
-                Console.WriteLine("Sign1 izlaz: " + output4);
+               
                 return true;
             }catch(Exception e)
             {
@@ -186,15 +170,15 @@ namespace BankService
             {
                 string path = "..//..//..//Certificates";
                 File.Delete(Path.Combine(path, username + ".pvk"));
-                File.Delete(Path.Combine(path, username + "_sign.pvk"));
                 File.Delete(Path.Combine(path, username + ".pfx"));
-                File.Delete(Path.Combine(path, username + "_sign.pfx"));
                 File.Delete(Path.Combine(path, username + ".cer"));
-                File.Delete(Path.Combine(path, username + "_sign.cer"));
 
+                string pin = Math.Abs(Guid.NewGuid().GetHashCode()).ToString();
+                pin = pin.Substring(0, 4);
 
-                IMDatabase.UsersDB[username].HaveCertificate = false;
+                Console.WriteLine("Certificate renewed.New pin: " + pin);
 
+                CreateMasterCardCertificate(username, pin);
                 return true;
             }
             catch (Exception e)
@@ -227,6 +211,15 @@ namespace BankService
             {
                 return false;
             }
+        }
+
+        public static string DecryptString(byte[] encryptedData, string secretKey)
+        {
+            byte[] decryptedBytes = TripleDES_Symm_Algorithm.Decrypt(encryptedData, secretKey);
+
+            string decryptedString = Encoding.UTF8.GetString(decryptedBytes);
+
+            return decryptedString;
         }
     }
 }

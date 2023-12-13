@@ -20,7 +20,33 @@ Nije implemenirana dodela MasterCard sertifikata prilikom kreiranja naloga, doda
 Implementirana nova klasa Accounts kako bi mogli dodavati nove naloge a ne nove korisnike pri kreiranju naloga.
 
 
+ /*
+                string cmdSign1 = "/c makecert -sv " + name + "_sign.pvk -iv TestCA.pvk -n \"CN=" + name + "_sign" + "\" -pe -ic TestCA.cer " + name + "_sign.cer -sr localmachine -ss My -sky signature";
+                var process3 = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+                {
+                    FileName = "cmd.exe",
+                    Arguments = cmdSign1,
+                    WorkingDirectory = workingDirectory
+                });
 
+                process3.WaitForExit();
+
+                string output3 = process.StandardOutput.ReadToEnd();
+                Console.WriteLine("Sign1 izlaz: " + output3);
+
+                string cmdSign2 = "/c pvk2pfx.exe /pvk " + name + "_sign.pvk /pi " + pin + " /spc " + name + "_sign.cer /pfx " + name + "_sign.pfx";
+                var process4 = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
+                {
+                    FileName = "cmd.exe",
+                    Arguments = cmdSign2,
+                    WorkingDirectory = workingDirectory
+                });
+
+                process4.WaitForExit();
+
+                string output4 = process.StandardOutput.ReadToEnd();
+                Console.WriteLine("Sign1 izlaz: " + output4);
+                */
 
 
 
