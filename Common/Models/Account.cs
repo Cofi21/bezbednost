@@ -16,9 +16,6 @@ namespace Common.Models
         private string pin;
 
         [DataMember]
-        public List<MasterCard> MasterCards { get; set; }
-
-        [DataMember]
         public string BrojRacuna { get => brojRacuna; set => brojRacuna = value; }
         [DataMember]
         public string Username { get => username; set => username = value; }
@@ -34,7 +31,6 @@ namespace Common.Models
         public Account() 
         {
             Stanje = 0;
-            MasterCards = new List<MasterCard>();
         }
 
         public Account(string brojRacuna, string pin, string username)
@@ -43,7 +39,6 @@ namespace Common.Models
             Username = username;
             Stanje = 0;
             Pin = pin;
-            MasterCards = new List<MasterCard>();
         }
 
 

@@ -33,13 +33,13 @@ namespace Replikator
 
                     if (isFirstTime)
                     {
-                        odrediste.Posalji(IMDatabase.AccountsDB.Values.ToList());
+                        odrediste.Send(IMDatabase.AccountsDB.Values.ToList());
                         isFirstTime = false; 
                     }
                     else
                     {
-                        List<Account> accounts = izvor.Preuzmi();
-                        odrediste.Posalji(accounts);
+                        List<Account> accounts = izvor.Collect();
+                        odrediste.Send(accounts);
 
                         Console.WriteLine("Repliciranje...");
                     }

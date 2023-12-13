@@ -47,22 +47,9 @@ namespace Client
             this.Close();
         }
 
-        public void TestCommunication()
+        public bool ResetPinCode(byte[] encMess, byte[] signature)
         {
-            try
-            {
-                factory.TestCommunication();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("[TestCommunication] ERROR = {0}", e.Message);
-                Console.WriteLine(e.StackTrace);
-            }
-        }
-
-        public bool ResetujPinKod(byte[] encMess, byte[] signature)
-        {
-            return factory.ResetujPinKod(encMess, signature);
+            return factory.ResetPinCode(encMess, signature);
         }
 
         public bool IzvrsiTransakciju(byte[] transaction, byte[] signature, byte[] encPin)

@@ -12,10 +12,10 @@ namespace Common
     public interface IReplikator
     {
         [OperationContract]
-        void Posalji(List<Account> studenti);
+        void Send(List<Account> studenti);
 
         [OperationContract]
-        List<Account> Preuzmi();
+        List<Account> Collect();
 
     }
 }

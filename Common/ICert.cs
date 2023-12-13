@@ -11,11 +11,9 @@ namespace Common
     [ServiceContract]
     public interface ICert
     {
-         [OperationContract]
-        void TestCommunication();
 
         [OperationContract]
-        bool ResetujPinKod(byte[] encMess, byte[] signature);
+        bool ResetPinCode(byte[] encMess, byte[] signature);
 
 
         [OperationContract]

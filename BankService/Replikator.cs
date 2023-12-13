@@ -11,7 +11,7 @@ namespace BankService
 {
     public class Replikator : IReplikator
     {
-        public void Posalji(List<Account> accounts)
+        public void Send(List<Account> accounts)
         {
             foreach(Account acc in accounts)
             {
@@ -19,7 +19,7 @@ namespace BankService
             }
         }
 
-        public List<Account> Preuzmi()
+        public List<Account> Collect()
         {
             List<Account> accountList = new List<Account>();
 

@@ -24,20 +24,20 @@ namespace Client
             Console.WriteLine($"Logovani korisnik { WindowsIdentity.GetCurrent().Name}");
             while (true)
             {
-                int operacija = Meni();
-                if(operacija == 3 || operacija == 4)
+                int operation = Menu();
+                if(operation == 3 || operation == 4)
                 {
-                    CertConnection(operacija);
+                    CertConnection(operation);
                 }
                 else
                 {
-                    AuthConnection(operacija);
+                    AuthConnection(operation);
                 }
             }
         }
 
 
-        public static int Meni()
+        public static int Menu()
         {
             Console.WriteLine("Izaberite zahtev: ");
             Console.WriteLine("\t1 - Kreiranje naloga");
@@ -51,7 +51,7 @@ namespace Client
             int izbor = Int32.Parse(Console.ReadLine());
             return izbor;
         }
-        static void CertConnection(int operacija)
+        static void CertConnection(int operation)
         {
             string srvCertCN = "server";
             string secretKey = "123456";
@@ -70,7 +70,7 @@ namespace Client
             {
                 try
                 {
-                    if(operacija == 3)
+                    if(operation == 3)
                     { 
                         Console.WriteLine("Izaberite akciju: ");
                         Console.WriteLine("\t1 - Uplata novca");
@@ -121,7 +121,7 @@ namespace Client
                             else Console.WriteLine("Transakcija nije moguca! Uneli ste nepostojeci broj racuna ili nemate dovoljno sredstava na racunu!");
                         }
 
-                    }else if(operacija == 4)
+                    }else if(operation == 4)
                     {
                         Console.Write("Unesite broj naloga: ");
                         string brojNaloga = Console.ReadLine();
@@ -130,7 +130,7 @@ namespace Client
 
                         byte[] encMess = EncryptString(message, secretKey);
                         byte[] signature = DigitalSignature.Create(brojNaloga, Manager.HashAlgorithm.SHA1, certificateSign);
-                        if (proxy.ResetujPinKod(encMess, signature))
+                        if (proxy.ResetPinCode(encMess, signature))
                         {
                             Console.WriteLine("Uspesna promena pin koda!");
                         }
@@ -152,6 +152,7 @@ namespace Client
             string address = "net.tcp://localhost:4000/WinService";
 
             string secretKey = "123456";
+            IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
 
             binding.Security.Mode = SecurityMode.Transport;
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
@@ -161,20 +162,21 @@ namespace Client
             string signCertCN = Common.Manager.Formatter.ParseName(WindowsIdentity.GetCurrent().Name) + "_ds";
             X509Certificate2 certificateSign = CertManager.GetCertificateFromStorage(StoreName.My, StoreLocation.LocalMachine, signCertCN);
 
+
             using (ClientWin proxy = new ClientWin(binding, address))
             {
-                ReadAccounts(proxy);
+                
                 try
                 {
                     switch (broj)
                     {
                         case 1:
-                            Account acc = KreirajNalog(secretKey);
+                            Account acc = CreateAccount(secretKey);
                             if (acc == null) Console.WriteLine("Nalog je null");
                             byte[] account = CreateEncryptedAccount(acc, secretKey);
-                            //byte[] signature = DigitalSignature.Create(account.ToString(), Manager.HashAlgorithm.SHA1, certificateSign);
-                            byte[] signature = null;
-                            if (proxy.KreirajNalog(account, signature))
+                            byte[] signature = DigitalSignature.Create(account.ToString(), Manager.HashAlgorithm.SHA1, certificateSign);
+
+                            if (proxy.CreateAccount(account, signature))
                             {
                                 Console.WriteLine("Cestitamo! Uspesno ste kreirali nalog!");
                             }
@@ -188,7 +190,7 @@ namespace Client
                             string[] parts = logged.Split('\\');
                             string username = parts[1];
                             Console.WriteLine("Povlacenje sertifikata za korisnika: " + username);
-                            if (proxy.PovuciSertifikat(username))
+                            if (proxy.PullAndCreateCertificate(username))
                                 Console.WriteLine("Sertifikat je uspesno izbrisan!");
                             else
                                 Console.WriteLine("Greska! Sertifikat nije obrisan!");
@@ -213,12 +215,11 @@ namespace Client
 
             foreach(Account acc in IMDatabase.AccountsDB.Values)
             {
-                Console.WriteLine($"\tBroj racuna: {acc.BrojRacuna}\tStanje: {acc.Stanje}");
+                Console.WriteLine($"\tUsername: {acc.Username}\tBroj racuna: {acc.BrojRacuna}\tStanje: {acc.Stanje}");
             }
         }  
         static string ReadPassword()
         {
-
             string password = "";
             ConsoleKeyInfo key;
 
@@ -236,19 +237,19 @@ namespace Client
                     if (password.Length > 0)
                     {
                         password = password.Remove(password.Length - 1);
-                        Console.Write("\b \b"); // Erase the character from the console
+                        Console.Write("\b \b"); 
                     }
                 }
                 else
                 {
                     password += key.KeyChar;
-                    Console.Write("*"); // Display asterisks instead of the actual characters
+                    Console.Write("*"); 
                 }
             }
 
             return password;
         }    
-        public static Account KreirajNalog(string secretKey)
+        public static Account CreateAccount(string secretKey)
         {
             string logged = WindowsIdentity.GetCurrent().Name;
             string[] parts = logged.Split('\\');
@@ -316,17 +317,6 @@ namespace Client
                 return null;
             }
 
-        }
-        public static void ReadAccounts(ClientWin proxy)
-        {                               //      return IMDatabase.AccountsDB;
-            Dictionary<string, Account> AllUsersDict = proxy.ReadDict();      
-            foreach (Account acc in AllUsersDict.Values)
-            {
-                if (!IMDatabase.AccountsDB.ContainsKey(acc.BrojRacuna))
-                {
-                    IMDatabase.AccountsDB.Add(acc.BrojRacuna, acc);
-                }
-            }
         }
         public static byte[] SerializeAccount(Account account)
         {

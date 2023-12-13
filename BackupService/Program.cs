@@ -35,7 +35,7 @@ namespace BackupService
                 while (true)
                 {
                     // Prihvatanje pristiglih naloga iz Replikator servisa
-                    List<Account> accounts = replicator.Preuzmi();
+                    List<Account> accounts = replicator.Collect();
                     
                     foreach(Account acc in accounts)
                     {

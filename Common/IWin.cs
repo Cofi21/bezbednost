@@ -12,21 +12,13 @@ namespace Common
     public interface IWin
     {
         [OperationContract]
-        void TestCommunication();
-
-
-        [OperationContract]
-        bool KreirajNalog(byte[] recievedData, byte[] signature);
+        bool CreateAccount(byte[] recievedData, byte[] signature);
 
         [OperationContract]
-        bool IzdajMasterCardSertifikat(string name, string pin);
+        bool CreateMasterCardCertificate(string name, string pin);
 
         [OperationContract]
-        bool PovuciSertifikat(string name);
-
-
-        [OperationContract]
-        Dictionary<string, Account> ReadDict();
+        bool PullAndCreateCertificate(string name);
 
     }
 }

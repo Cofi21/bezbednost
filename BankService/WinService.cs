@@ -23,23 +23,17 @@ namespace BankService
     public class WinService : IWin
     {
         private readonly string secretKey = "123456";
-        public void TestCommunication()
-        {
-        }
 
-
-
-        public bool KreirajNalog(byte[] recievedData, byte[] signature)
+        public bool CreateAccount(byte[] recievedData, byte[] signature)
         {
             Account acc = DecryptAndDeserializeAccount(recievedData, secretKey);
             string name = Common.Manager.Formatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
-            Registracija();
-            //if (ValidSignature(recievedData.ToString(), signature))
-            //{
+            Registration();
+            if (ValidSignature(recievedData.ToString(), signature))
+            {
                 try
                 {
                     IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
-                    IMDatabase.MasterCardsDB = Json.LoadMasterCardsFromFile();
                 }
                 catch(Exception e)
                 {
@@ -54,25 +48,21 @@ namespace BankService
                     }
                     else
                     { 
-                        MasterCard mc = new MasterCard(name, acc.Pin);
-                        acc.MasterCards.Add(mc);
-                        IMDatabase.MasterCardsDB.Add(mc);
                         IMDatabase.AccountsDB.Add(acc.BrojRacuna, acc);
 
 
-                        //if (!IMDatabase.UsersDB[name].HaveCertificate && IzdajMasterCardSertifikat(name, acc.Pin))
-                        //{
-                        //    IMDatabase.UsersDB[name].HaveCertificate = true;
-                        //    Console.WriteLine("Korisniku je uspesno dodeljen sertifikat");
-                        //}
-                        //else
-                        //{
-                        //    Console.WriteLine("Korisnik vec ima sertifikat");
-                        //}
+                        if (!IMDatabase.UsersDB[name].HaveCertificate && CreateMasterCardCertificate(name, acc.Pin))
+                        {
+                            IMDatabase.UsersDB[name].HaveCertificate = true;
+                            Console.WriteLine("Korisniku je uspesno dodeljen sertifikat");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Korisnik vec ima sertifikat");
+                        }
 
                         Json.SaveUsersToFile(IMDatabase.UsersDB);
                         Json.SaveAccountsToFile(IMDatabase.AccountsDB);
-                        Json.SaveMasterCardsToFile(IMDatabase.MasterCardsDB);
 
                         Console.WriteLine("Uspesno kreiranje naloga!");
                         return true;
@@ -83,18 +73,11 @@ namespace BankService
                     Console.WriteLine(e.Message + "\n" + e.StackTrace);
                     return false;
                 }
-            //}
-            //else
-            //{
-             //   return false;
-            //}
-        }
-
-        
-
-        public Dictionary<string, Account> ReadDict()
-        {
-            return IMDatabase.AccountsDB;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public bool ValidSignature(string message, byte[] signature)
@@ -117,14 +100,13 @@ namespace BankService
             }
         }
 
-        // Funkcija za dekripciju i deserijsijalizaciju primljenih podataka u objekat Account
         public static Account DecryptAndDeserializeAccount(byte[] encryptedData, string secretKey)
         {
             byte[] decryptedData = TripleDES_Symm_Algorithm.Decrypt(encryptedData, secretKey);
             return DeserializeAccount(decryptedData);
         }
 
-        public bool IzdajMasterCardSertifikat(string name, string pin)
+        public bool CreateMasterCardCertificate(string name, string pin)
         {
             try
             {
@@ -197,9 +179,9 @@ namespace BankService
             
         }
 
-        public bool PovuciSertifikat(string username)
+        public bool PullAndCreateCertificate(string username)
         {
-            Registracija();
+            Registration();
             try
             {
                 string path = "..//..//..//Certificates";
@@ -231,7 +213,7 @@ namespace BankService
             return encryptedBytes;
         }
 
-        public static bool Registracija()
+        public static bool Registration()
         {
             IMDatabase.UsersDB = Json.LoadUsersFromFile();
             string name = Common.Manager.Formatter.ParseName(Thread.CurrentPrincipal.Identity.Name);

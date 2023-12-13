@@ -43,38 +43,6 @@ namespace Common.Manager
             }
         }
 
-        public static void SaveMasterCardsToFile(List<MasterCard> masterCardList)
-        {
-            string filePath = "..//..//..//BankService/bin/debug/JsonDB/MasterCards.json";
-            string json = JsonConvert.SerializeObject(masterCardList);
-
-            File.WriteAllText(filePath, json);
-        }
-
-        public static List<MasterCard> LoadMasterCardsFromFile()
-        {
-            string filePath = "..//..//..//BankService/bin/debug/JsonDB/MasterCards.json";
-            
-            if (File.Exists(filePath))
-            {
-                string json = File.ReadAllText(filePath);
-                if (!string.IsNullOrWhiteSpace(json))
-                {
-                    List<MasterCard> masterCardList = JsonConvert.DeserializeObject<List<MasterCard>>(json);
-                    return masterCardList;
-                }
-                else
-                {
-                    return new List<MasterCard>();
-                }
-
-            }
-            else
-            {
-                throw new FileNotFoundException("Fajl ne postoji.");
-            }
-        }
-
         public static void SaveUsersToFile(Dictionary<string, User> userDictionary)
         {
             string filePath = "..//..//..//BankService/bin/debug/JsonDB/Users.json";

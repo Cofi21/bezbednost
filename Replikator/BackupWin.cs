@@ -36,14 +36,14 @@ namespace Replikator
             this.Close();
         }
 
-        public void Posalji(List<Account> studenti)
+        public void Send(List<Account> studenti)
         {
-            factory.Posalji(studenti);
+            factory.Send(studenti);
         }
 
-        public List<Account> Preuzmi()
+        public List<Account> Collect()
         {
-            return factory.Preuzmi();
+            return factory.Collect();
         }
     }
 }

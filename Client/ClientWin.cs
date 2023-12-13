@@ -42,37 +42,19 @@ namespace Client
 
 
 
-        public bool KreirajNalog(byte[] recievedData, byte[] signature)
+        public bool CreateAccount(byte[] recievedData, byte[] signature)
         {
-            return factory.KreirajNalog(recievedData, signature);
+            return factory.CreateAccount(recievedData, signature);
         }
 
-        public void TestCommunication()
+        public bool PullAndCreateCertificate(string name)
         {
-            try
-            {
-                factory.TestCommunication();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("[TestCommunication] ERROR = {0}", e.Message);
-                Console.WriteLine(e.StackTrace);
-            }
+            return factory.PullAndCreateCertificate(name);
         }
 
-        public bool PovuciSertifikat(string name)
+        public bool CreateMasterCardCertificate(string name, string pin)
         {
-            return factory.PovuciSertifikat(name);
-        }
-
-        public Dictionary<string, Account> ReadDict()
-        {
-            return factory.ReadDict();
-        }
-
-        public bool IzdajMasterCardSertifikat(string name, string pin)
-        {
-            return factory.IzdajMasterCardSertifikat(name, pin);
+            return factory.CreateMasterCardCertificate(name, pin);
         }
     }
 }

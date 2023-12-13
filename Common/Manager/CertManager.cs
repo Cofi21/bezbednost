@@ -34,12 +34,5 @@ namespace Common.Manager
 			return certificate;
 		}
 
-		public static X509Certificate2 GetCertificateFromFile(SecureString pwd)
-		{
-			X509Certificate2 certificate = null;
-
-
-			return certificate;
-		}
 	}
 }
