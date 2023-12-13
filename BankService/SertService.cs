@@ -19,14 +19,16 @@ namespace BankService
     {
         //IBankingAudit factory;
 
-        private static string clientName = Common.Manager.Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name);
-        private static string secretKey = SecretKey.LoadKey(clientName);
+        
         private const int _maxNumberOfTransactions = 5;
         private const int _secondsBetweenTransactions = 120;
         private Dictionary<string, List<TransactionDetails>> receivedTransactionsDict = new Dictionary<string, List<TransactionDetails>>();
 
         public bool ResetPinCode(byte[] encMess, byte[] signature)
         {
+            string clientName = Common.Manager.Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name);
+            string secretKey = SecretKey.LoadKey(clientName);
+
             IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
             string decMess = DecryptString(encMess, secretKey);
             string[] parts = decMess.Split('|');
@@ -54,6 +56,9 @@ namespace BankService
         }
         public bool IzvrsiTransakciju(byte[] transaction, byte[] signature, byte[] encPin)
         {
+            string clientName = Common.Manager.Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name);
+            string secretKey = SecretKey.LoadKey(clientName);
+            Console.WriteLine("Secret key" + secretKey);
             try
             {
                 DateTime currentTime = DateTime.UtcNow;
@@ -185,7 +190,6 @@ namespace BankService
 
             return decryptedString;
         }
-
         public bool IsMaxNumberOfTransactionsExceeded(Transaction transaction, DateTime currentTime, out List<TransactionDetails> listOfTransactionDetails)
         {
             string accountNumber = transaction.BrojRacuna;

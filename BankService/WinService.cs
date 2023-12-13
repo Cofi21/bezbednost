@@ -109,6 +109,8 @@ namespace BankService
 
         public bool CreateMasterCardCertificate(string name, string pin)
         {
+            string logged = Common.Manager.Formatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
+            secretKey = SecretKey.LoadKey(logged);
             try
             {
                 string workingDirectory = "..//..//..//Certificates";
@@ -136,7 +138,9 @@ namespace BankService
                     pin1 = DecryptString(key, secretKey);
                 }
                 else
-                   pin1 = pin;
+                  
+                pin1 = pin;
+
                 string cmd2 = "/c pvk2pfx.exe /pvk " + name + ".pvk /pi " + pin1 + " /spc " + name + ".cer /pfx " + name + ".pfx";
                 Console.WriteLine(cmd2);
                 var process2 = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()

@@ -22,6 +22,19 @@ namespace Client
         static void Main(string[] args)
         {
             Console.WriteLine($"Logovani korisnik { WindowsIdentity.GetCurrent().Name}");
+
+            string logged = WindowsIdentity.GetCurrent().Name;
+            string[] parts = logged.Split('\\');
+            string username = parts[1];
+
+            string tajniKljuc = SecretKey.LoadKey(username);
+            if(string.IsNullOrEmpty(tajniKljuc))
+            {
+                string secretKey = SecretKey.GenerateKey();
+                SecretKey.StoreKey(secretKey, username);
+                Console.WriteLine("Uspesno izgenerisan " + secretKey);
+            }
+
             while (true)
             {
                 int operation = Menu();
@@ -58,8 +71,8 @@ namespace Client
             string logged = WindowsIdentity.GetCurrent().Name;
             string[] parts = logged.Split('\\');
             string username = parts[1];
-            string secretKey = SecretKey.GenerateKey();
-            SecretKey.StoreKey(secretKey, username);
+
+            string secretKey = SecretKey.LoadKey(username);
 
             NetTcpBinding binding = new NetTcpBinding();
             binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Certificate;
@@ -159,8 +172,8 @@ namespace Client
             string logged = WindowsIdentity.GetCurrent().Name;
             string[] parts = logged.Split('\\');
             string username = parts[1];
-            string secretKey = SecretKey.GenerateKey();
-            SecretKey.StoreKey(secretKey, username);
+
+            string secretKey = SecretKey.LoadKey(username);
 
             IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
 
@@ -175,7 +188,6 @@ namespace Client
 
             using (ClientWin proxy = new ClientWin(binding, address))
             {
-                
                 try
                 {
                     switch (broj)
@@ -219,9 +231,13 @@ namespace Client
         public static void Ispis()
         {
             IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
+            string logged = WindowsIdentity.GetCurrent().Name;
+            string[] parts = logged.Split('\\');
+            string username = parts[1];
 
-            foreach(Account acc in IMDatabase.AccountsDB.Values)
+            foreach (Account acc in IMDatabase.AccountsDB.Values)
             {
+                if (username != acc.Username) continue;
                 Console.WriteLine($"\tUsername: {acc.Username}\tBroj racuna: {acc.BrojRacuna}\tStanje: {acc.Stanje}");
             }
         }  
