@@ -24,6 +24,7 @@ namespace BackupService
             ServiceHost hostWin = new ServiceHost(typeof(Replikator));
             hostWin.AddServiceEndpoint(typeof(IReplikator), bindingWin, addressWin);
 
+
             try
             {
                 hostWin.Open();
@@ -34,15 +35,6 @@ namespace BackupService
 
                 while (true)
                 {
-                    // Prihvatanje pristiglih naloga iz Replikator servisa
-                    List<Account> accounts = replicator.Collect();
-                    
-                    foreach(Account acc in accounts)
-                    {
-                        Console.WriteLine(acc + "\n");
-                    }
-                    Console.WriteLine("----------------------------");
-
                     Thread.Sleep(4000);
                 }
             }catch(Exception e)

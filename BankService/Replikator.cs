@@ -17,6 +17,12 @@ namespace BankService
             {
                 IMDatabase.AccountsDB[acc.BrojRacuna] = acc;
             }
+
+            Console.WriteLine("Primljeni podaci o nalozima:");
+            foreach (var acc in accounts)
+            {
+                Console.WriteLine($"Broj računa: {acc.BrojRacuna}, Stanje na računu: {acc.Stanje}");
+            }
         }
 
         public List<Account> Collect()

@@ -33,6 +33,7 @@ namespace Replikator
 
                     if (isFirstTime)
                     {
+                        IMDatabase.AccountsDB = Json.LoadAccountsFromFile();
                         odrediste.Send(IMDatabase.AccountsDB.Values.ToList());
                         isFirstTime = false; 
                     }
