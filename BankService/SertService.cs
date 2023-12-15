@@ -78,7 +78,8 @@ namespace BankService
                             // proveriti jel ovo okej mesto ili treba samo ako je pin tacan.
                             if (IsMaxNumberOfTransactionsExceeded(decTrans, currentTime, out List<TransactionDetails> listOfTransactionDetails))
                             {
-                                Audit audit = new Audit()
+                                // Izmeniti da bude drugi objekat, treba nam Audit za EventLog
+                                TransactionPayments tp = new TransactionPayments()
                                 {
                                     BankName = "BankName",
                                     AccountName = decTrans.BrojRacuna,
@@ -86,7 +87,7 @@ namespace BankService
                                     TransactionsList = listOfTransactionDetails
                                 };
 
-                                //factory.AccessingLog(audit);
+                                //factory.AccessingLog(tp);
 
                             }
 
@@ -98,6 +99,10 @@ namespace BankService
                                 IMDatabase.AccountsDB[decTrans.BrojRacuna].Stanje += decTrans.Svota;
                                 Console.WriteLine($"Uspesna uplata!");
                                 Json.SaveAccountsToFile(IMDatabase.AccountsDB);
+
+                                // Audit log
+                                Audit.TransactionSuccess(clientName);
+
                                 return true;
                             }
                             else

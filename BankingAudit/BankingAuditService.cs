@@ -1,5 +1,6 @@
 ﻿using Common;
 using Common.Manager;
+using Common.Models;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,17 +13,18 @@ namespace BankingAudit
 {
     public class BankingAuditService : IBankingAudit
     {
-        public void AccessingLog(Audit audit)
+        // AccessingLog treba da primi parametar objekta
+        public void AccessingLog(TransactionPayments tp)
         {
             string fileInput = string.Empty;
             fileInput += "\n---------------------------------------------------------------\n";
-            fileInput += "Bank name: " + audit.BankName + "\n";
-            fileInput += "Account name: " + audit.AccountName + "\n";
-            fileInput += "Time of Detection: " + audit.TimeOfDetection.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
+            fileInput += "Bank name: " + tp.BankName + "\n";
+            fileInput += "Account name: " + tp.AccountName + "\n";
+            fileInput += "Time of Detection: " + tp.TimeOfDetection.ToString("dd.MM.yyyy HH:mm:ss") + "\n";
             fileInput += "Transactions:";
             string numberOfTransactions;
 
-            foreach (TransactionDetails td in audit.TransactionsList)
+            foreach (TransactionDetails td in tp.TransactionsList)
             {
                 numberOfTransactions = Regex.Match(td.ToString(), @"\d+").Value;
 

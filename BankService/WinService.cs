@@ -109,6 +109,7 @@ namespace BankService
 
         public bool CreateMasterCardCertificate(string name, string pin)
         {
+            // Dodati logovanje
             string logged = Common.Manager.Formatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
             secretKey = SecretKey.LoadKey(logged);
             try
@@ -158,11 +159,29 @@ namespace BankService
                 string output2 = process2.StandardOutput.ReadToEnd();
                 Console.WriteLine("pfx izlaz:" + output2);
 
-               
+                // Audit log
+                try
+                {
+                    Audit.SertificateCreationSuccess(name);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Sertificate Creation failed with an error: " + e.Message);
+                }
+
                 return true;
             }catch(Exception e)
             {
+                // Audit log
                 Console.WriteLine(e.Message + "\n" + e.StackTrace);
+                try
+                {
+                    Audit.SertificateCreationFailed(name);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error in sertificate creation " + ex.Message);
+                }
                 return false;
             }
             
@@ -170,6 +189,7 @@ namespace BankService
 
         public bool PullAndCreateCertificate(string username)
         {
+            // Dodati logovanje
             Registration();
             try
             {

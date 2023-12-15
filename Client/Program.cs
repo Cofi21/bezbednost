@@ -21,6 +21,7 @@ namespace Client
     {
         static void Main(string[] args)
         {
+            Audit.Initialize();
             Console.WriteLine($"Logovani korisnik { WindowsIdentity.GetCurrent().Name}");
 
             string logged = WindowsIdentity.GetCurrent().Name;

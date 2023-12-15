@@ -1,4 +1,5 @@
 ﻿using Common.Manager;
+using Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ namespace Common
     public interface IBankingAudit
     {
         [OperationContract]
-        void AccessingLog(Audit audit);
+        // AccessingLog treba da primi objekat
+        void AccessingLog(TransactionPayments tp);
     }
 }

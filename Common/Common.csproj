@@ -52,6 +52,12 @@
     <Compile Include="IReplikator.cs" />
     <Compile Include="IWin.cs" />
     <Compile Include="Manager\Audit.cs" />
+    <Compile Include="Manager\AuditEventFile.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>AuditEventFile.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Manager\AuditEvents.cs" />
     <Compile Include="Manager\CertManager.cs" />
     <Compile Include="Manager\DigitalSignature.cs" />
     <Compile Include="Manager\Formatter.cs" />
@@ -60,8 +66,15 @@
     <Compile Include="Manager\TransactionDetails.cs" />
     <Compile Include="Models\Account.cs" />
     <Compile Include="Models\Transaction.cs" />
+    <Compile Include="Models\TransactionPayments.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Manager\AuditEventFile.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>AuditEventFile.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

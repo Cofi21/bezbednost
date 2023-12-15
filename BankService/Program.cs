@@ -5,6 +5,7 @@ using System;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceModel;
+using System.ServiceModel.Description;
 using System.ServiceModel.Security;
 
 namespace BankService
@@ -14,6 +15,7 @@ namespace BankService
         
         static void Main(string[] args)
         {
+            Audit.Initialize();
             Console.WriteLine("Server je pokrenut od strane " + WindowsIdentity.GetCurrent().Name);
 
             #region Windows
@@ -56,6 +58,15 @@ namespace BankService
             bindingAudit.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
             ServiceHost hostWinBankingAudit = new ServiceHost(typeof(BankingAuditService));
             hostWinBankingAudit.AddServiceEndpoint(typeof(IBankingAudit), bindingAudit, bankAuditAddress);
+            #endregion
+
+            #region AuditBehavior
+            //ServiceSecurityAuditBehavior newAudit = new ServiceSecurityAuditBehavior();
+            //newAudit.AuditLogLocation = AuditLogLocation.Application;
+            //newAudit.ServiceAuthorizationAuditLevel = AuditLevel.SuccessOrFailure;
+
+            //hostWin.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
+            //hostWin.Description.Behaviors.Add(newAudit);
             #endregion
 
             try
