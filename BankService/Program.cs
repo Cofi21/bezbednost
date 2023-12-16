@@ -60,14 +60,7 @@ namespace BankService
             hostWinBankingAudit.AddServiceEndpoint(typeof(IBankingAudit), bindingAudit, bankAuditAddress);
             #endregion
 
-            #region AuditBehavior
-            //ServiceSecurityAuditBehavior newAudit = new ServiceSecurityAuditBehavior();
-            //newAudit.AuditLogLocation = AuditLogLocation.Application;
-            //newAudit.ServiceAuthorizationAuditLevel = AuditLevel.SuccessOrFailure;
-
-            //hostWin.Description.Behaviors.Remove<ServiceSecurityAuditBehavior>();
-            //hostWin.Description.Behaviors.Add(newAudit);
-            #endregion
+            
 
             try
             {
@@ -79,9 +72,6 @@ namespace BankService
 
                 hostWinRep.Open();
                 Console.WriteLine("Replikator server");
-
-                hostWinBankingAudit.Open();
-                Console.WriteLine("Banking Audit server");
 
                 Console.ReadKey(); 
             }
@@ -95,7 +85,6 @@ namespace BankService
                 hostCert.Close();
                 hostWin.Close();
                 hostWinRep.Close();
-                hostWinBankingAudit.Close();
             }
         }
     }

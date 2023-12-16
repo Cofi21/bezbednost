@@ -16,6 +16,7 @@ namespace BankingAudit
         // AccessingLog treba da primi parametar objekta
         public void AccessingLog(TransactionPayments tp)
         {
+            Console.WriteLine("Izvrsenje...");
             string fileInput = string.Empty;
             fileInput += "\n---------------------------------------------------------------\n";
             fileInput += "Bank name: " + tp.BankName + "\n";
@@ -38,6 +39,7 @@ namespace BankingAudit
             using (StreamWriter sw = new StreamWriter("..\\..\\LogFile.txt", true))
             {
                 sw.WriteLine(fileInput);
+                Console.WriteLine(fileInput);
             }
         }
     }

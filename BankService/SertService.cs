@@ -7,19 +7,20 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.Serialization;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Principal;
 using System.ServiceModel;
+using System.ServiceModel.Channels;
 using System.Text;
 
 namespace BankService
 {
     public class SertService : ICert
     {
-        //IBankingAudit factory;
 
-        
+
         private const int _maxNumberOfTransactions = 5;
         private const int _secondsBetweenTransactions = 120;
         private Dictionary<string, List<TransactionDetails>> receivedTransactionsDict = new Dictionary<string, List<TransactionDetails>>();
@@ -56,9 +57,18 @@ namespace BankService
         }
         public bool IzvrsiTransakciju(byte[] transaction, byte[] signature, byte[] encPin)
         {
+            NetTcpBinding binding = new NetTcpBinding();
+            binding.Security.Mode = SecurityMode.Transport;
+            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
+
+            ChannelFactory<IBankingAudit> factory = new ChannelFactory<IBankingAudit>(binding,
+            new EndpointAddress("net.tcp://localhost:8001/BankingAuditService"));
+
+            IBankingAudit serviceProxy = factory.CreateChannel();
+
             string clientName = Common.Manager.Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name);
             string secretKey = SecretKey.LoadKey(clientName);
-            Console.WriteLine("Secret key" + secretKey);
+
             try
             {
                 DateTime currentTime = DateTime.UtcNow;
@@ -78,6 +88,7 @@ namespace BankService
                             // proveriti jel ovo okej mesto ili treba samo ako je pin tacan.
                             if (IsMaxNumberOfTransactionsExceeded(decTrans, currentTime, out List<TransactionDetails> listOfTransactionDetails))
                             {
+                                Console.WriteLine("Prevelik broj transakcija na istom racunu!");
                                 // Izmeniti da bude drugi objekat, treba nam Audit za EventLog
                                 TransactionPayments tp = new TransactionPayments()
                                 {
@@ -87,8 +98,7 @@ namespace BankService
                                     TransactionsList = listOfTransactionDetails
                                 };
 
-                                //factory.AccessingLog(tp);
-
+                                serviceProxy.AccessingLog(tp);
                             }
 
                             byte[] key = Convert.FromBase64String(IMDatabase.AccountsDB[decTrans.BrojRacuna].Pin);
