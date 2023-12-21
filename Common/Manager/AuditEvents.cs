@@ -12,7 +12,9 @@ namespace Common.Manager
     {
         SertificateCreationSuccess = 0,
         SertificateCreationFailed = 1,
-        TransactionSuccess = 2
+        TransactionSuccess = 2,
+        BankingAuditSuccess = 3,
+        BankingAuditFailed = 4
     }
     public class AuditEvents
     {
@@ -61,5 +63,22 @@ namespace Common.Manager
                 return ResourceMgr.GetString(AuditEventTypes.TransactionSuccess.ToString());
             }
         }
+        public static string BankingAuditSuccess
+        {
+            get
+            {
+                //TO DO
+                return ResourceMgr.GetString(AuditEventTypes.BankingAuditSuccess.ToString());
+            }
+        }
+        public static string BankingAuditFailed
+        {
+            get
+            {
+                //TO DO
+                return ResourceMgr.GetString(AuditEventTypes.BankingAuditFailed.ToString());
+            }
+        }
+
     }
 }

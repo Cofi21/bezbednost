@@ -88,6 +88,40 @@ namespace Common.Manager
                     (int)AuditEventTypes.TransactionSuccess));
             }
         }
+        public static void BankingAuditSuccess(string name)
+        {
+            //TO DO
+
+            if (customLog != null)
+            {
+                string BankingAuditSuccess =
+                    AuditEvents.BankingAuditSuccess;
+                string message = String.Format(BankingAuditSuccess, name);
+                customLog.WriteEntry(message);
+            }
+            else
+            {
+                throw new ArgumentException(string.Format("Error while trying to write event (eventid = {0}) to event log.",
+                    (int)AuditEventTypes.BankingAuditSuccess));
+            }
+        }
+        public static void BankingAuditFailed(string name)
+        {
+            //TO DO
+
+            if (customLog != null)
+            {
+                string BankingAuditFailed =
+                    AuditEvents.BankingAuditFailed;
+                string message = String.Format(BankingAuditFailed, name);
+                customLog.WriteEntry(message);
+            }
+            else
+            {
+                throw new ArgumentException(string.Format("Error while trying to write event (eventid = {0}) to event log.",
+                    (int)AuditEventTypes.BankingAuditFailed));
+            }
+        }
 
         public void Dispose()
         {

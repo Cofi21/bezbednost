@@ -61,6 +61,24 @@ namespace Common.Manager {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Transaction exceeded failed! {0}.
+        /// </summary>
+        internal static string BankingAuditFailed {
+            get {
+                return ResourceManager.GetString("BankingAuditFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Transaction exceeded! {0}.
+        /// </summary>
+        internal static string BankingAuditSuccess {
+            get {
+                return ResourceManager.GetString("BankingAuditSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sertificate creation failed {0}.
         /// </summary>
         internal static string SertificateCreationFailed {

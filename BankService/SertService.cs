@@ -21,7 +21,7 @@ namespace BankService
     {
 
 
-        private const int _maxNumberOfTransactions = 5;
+        private const int _maxNumberOfTransactions = 3;
         private const int _secondsBetweenTransactions = 120;
         private Dictionary<string, List<TransactionDetails>> receivedTransactionsDict = new Dictionary<string, List<TransactionDetails>>();
 
@@ -99,6 +99,15 @@ namespace BankService
                                 };
 
                                 serviceProxy.AccessingLog(tp);
+                                //try
+                                //{
+                                //    Audit.BankingAuditSuccess(tp.BankName);
+                                //}
+                                //catch (Exception e)
+                                //{
+                                //    Console.WriteLine("Banking Audit failed with an error: " + e.Message);
+                                //    Audit.BankingAuditFailed(tp.BankName);
+                                //}
                             }
 
                             byte[] key = Convert.FromBase64String(IMDatabase.AccountsDB[decTrans.BrojRacuna].Pin);
@@ -111,7 +120,7 @@ namespace BankService
                                 Json.SaveAccountsToFile(IMDatabase.AccountsDB);
 
                                 // Audit log
-                                Audit.TransactionSuccess(clientName);
+                                //Audit.TransactionSuccess(clientName);
 
                                 return true;
                             }
