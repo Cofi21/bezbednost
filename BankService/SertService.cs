@@ -23,7 +23,7 @@ namespace BankService
 
         private const int _maxNumberOfTransactions = 3;
         private const int _secondsBetweenTransactions = 120;
-        private Dictionary<string, List<TransactionDetails>> receivedTransactionsDict = new Dictionary<string, List<TransactionDetails>>();
+        private static Dictionary<string, List<TransactionDetails>> receivedTransactionsDict = new Dictionary<string, List<TransactionDetails>>();
 
         public bool ResetPinCode(byte[] encMess, byte[] signature)
         {
