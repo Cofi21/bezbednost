@@ -57,14 +57,7 @@ namespace BankService
         }
         public bool IzvrsiTransakciju(byte[] transaction, byte[] signature, byte[] encPin)
         {
-            NetTcpBinding binding = new NetTcpBinding();
-            binding.Security.Mode = SecurityMode.Transport;
-            binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
-
-            ChannelFactory<IBankingAudit> factory = new ChannelFactory<IBankingAudit>(binding,
-            new EndpointAddress("net.tcp://localhost:8001/BankingAuditService"));
-
-            IBankingAudit serviceProxy = factory.CreateChannel();
+            
 
             string clientName = Common.Manager.Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name);
             string secretKey = SecretKey.LoadKey(clientName);
@@ -88,7 +81,7 @@ namespace BankService
                             // proveriti jel ovo okej mesto ili treba samo ako je pin tacan.
                             if (IsMaxNumberOfTransactionsExceeded(decTrans, currentTime, out List<TransactionDetails> listOfTransactionDetails))
                             {
-                                Console.WriteLine("Prevelik broj transakcija na istom racunu!");
+                                Console.WriteLine("Preveliki broj transakcija na istom racunu!");
                                 // Izmeniti da bude drugi objekat, treba nam Audit za EventLog
                                 TransactionPayments tp = new TransactionPayments()
                                 {
@@ -98,7 +91,22 @@ namespace BankService
                                     TransactionsList = listOfTransactionDetails
                                 };
 
-                                serviceProxy.AccessingLog(tp);
+                                try
+                                {
+                                    NetTcpBinding binding = new NetTcpBinding();
+                                    binding.Security.Mode = SecurityMode.Transport;
+                                    binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
+
+                                    ChannelFactory<IBankingAudit> factory = new ChannelFactory<IBankingAudit>(binding,
+                                    new EndpointAddress("net.tcp://localhost:8001/BankingAuditService"));
+
+                                    IBankingAudit serviceProxy = factory.CreateChannel();
+                                    serviceProxy.AccessingLog(tp);
+                                }
+                                catch(Exception e)
+                                {
+                                    Console.WriteLine(e.Message + "\n" + e.StackTrace);
+                                }
                                 //try
                                 //{
                                 //    Audit.BankingAuditSuccess(tp.BankName);
