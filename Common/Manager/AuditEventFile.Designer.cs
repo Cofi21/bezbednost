@@ -61,7 +61,7 @@ namespace Common.Manager {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Transaction exceeded failed! {0}.
+        ///   Looks up a localized string similar to Transaction exceeded failed! {0} {1} {2} {3}.
         /// </summary>
         internal static string BankingAuditFailed {
             get {
@@ -70,11 +70,65 @@ namespace Common.Manager {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Transaction exceeded! {0}.
+        ///   Looks up a localized string similar to Transaction exceeded! {0} {1} {2} {3}.
         /// </summary>
         internal static string BankingAuditSuccess {
             get {
                 return ResourceManager.GetString("BankingAuditSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Withdraw failed {0}.
+        /// </summary>
+        internal static string PaymentFailed {
+            get {
+                return ResourceManager.GetString("PaymentFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Withdraw successful {0}.
+        /// </summary>
+        internal static string PaymentSuccess {
+            get {
+                return ResourceManager.GetString("PaymentSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pull and create failed {0}.
+        /// </summary>
+        internal static string PullAndCreateFailed {
+            get {
+                return ResourceManager.GetString("PullAndCreateFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pull and create is successful {0}.
+        /// </summary>
+        internal static string PullAndCreateSuccess {
+            get {
+                return ResourceManager.GetString("PullAndCreateSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset pin code failed {0}.
+        /// </summary>
+        internal static string ResetPinCodeFailed {
+            get {
+                return ResourceManager.GetString("ResetPinCodeFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reset pin code is successful {0}.
+        /// </summary>
+        internal static string ResetPinCodeSuccess {
+            get {
+                return ResourceManager.GetString("ResetPinCodeSuccess", resourceCulture);
             }
         }
         
@@ -97,7 +151,25 @@ namespace Common.Manager {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Transaction is successfull {0}.
+        ///   Looks up a localized string similar to Deposit failed! {0}.
+        /// </summary>
+        internal static string TransactionFailed {
+            get {
+                return ResourceManager.GetString("TransactionFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Transaction request is successful {0}.
+        /// </summary>
+        internal static string TransactionRequestSuccess {
+            get {
+                return ResourceManager.GetString("TransactionRequestSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deposit is successfull {0}.
         /// </summary>
         internal static string TransactionSuccess {
             get {

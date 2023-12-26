@@ -109,7 +109,6 @@ namespace BankService
 
         public bool CreateMasterCardCertificate(string name, string pin)
         {
-            // Dodati logovanje
             string logged = Common.Manager.Formatter.ParseName(Thread.CurrentPrincipal.Identity.Name);
             secretKey = SecretKey.LoadKey(logged);
             try
@@ -189,7 +188,6 @@ namespace BankService
 
         public bool PullAndCreateCertificate(string username)
         {
-            // Dodati logovanje
             Registration();
             try
             {
@@ -204,10 +202,14 @@ namespace BankService
                 Console.WriteLine("Certificate renewed.New pin: " + pin);
 
                 CreateMasterCardCertificate(username, pin);
+
+                Audit.PullAndCreateSuccess(username);
+
                 return true;
             }
             catch (Exception e)
             {
+                Audit.PullAndCreateFailed(username);
                 Console.WriteLine(e.Message + "\n" + e.StackTrace);
                 return false;
             }

@@ -14,7 +14,16 @@ namespace Common.Manager
         SertificateCreationFailed = 1,
         TransactionSuccess = 2,
         BankingAuditSuccess = 3,
-        BankingAuditFailed = 4
+        BankingAuditFailed = 4,
+        PullAndCreateSuccess = 5,
+        PullAndCreateFailed = 6,
+        PaymentSuccess = 7,
+        PaymentFailed = 8,
+        TransactionFailed = 9,
+        ResetPinCodeSuccess = 10,
+        ResetPinCodeFailed = 11,
+        TransactionRequestSuccess = 12,
+        TransactionRequestFailed = 13
     }
     public class AuditEvents
     {
@@ -63,6 +72,14 @@ namespace Common.Manager
                 return ResourceMgr.GetString(AuditEventTypes.TransactionSuccess.ToString());
             }
         }
+        public static string TransactionFailed
+        {
+            get
+            {
+                //TO DO
+                return ResourceMgr.GetString(AuditEventTypes.TransactionFailed.ToString());
+            }
+        }
         public static string BankingAuditSuccess
         {
             get
@@ -77,6 +94,70 @@ namespace Common.Manager
             {
                 //TO DO
                 return ResourceMgr.GetString(AuditEventTypes.BankingAuditFailed.ToString());
+            }
+        }
+        public static string PullAndCreateSuccess
+        {
+            get
+            {
+                //TO DO
+                return ResourceMgr.GetString(AuditEventTypes.PullAndCreateSuccess.ToString());
+            }
+        }
+        public static string PullAndCreateFailed
+        {
+            get
+            {
+                //TO DO
+                return ResourceMgr.GetString(AuditEventTypes.PullAndCreateFailed.ToString());
+            }
+        }
+        public static string PaymentSuccess
+        {
+            get
+            {
+                //TO DO
+                return ResourceMgr.GetString(AuditEventTypes.PaymentSuccess.ToString());
+            }
+        }
+        public static string PaymentFailed
+        {
+            get
+            {
+                //TO DO
+                return ResourceMgr.GetString(AuditEventTypes.PaymentFailed.ToString());
+            }
+        }
+        public static string ResetPinCodeSuccess
+        {
+            get
+            {
+                //TO DO
+                return ResourceMgr.GetString(AuditEventTypes.ResetPinCodeSuccess.ToString());
+            }
+        }
+        public static string ResetPinCodeFailed
+        {
+            get
+            {
+                //TO DO
+                return ResourceMgr.GetString(AuditEventTypes.ResetPinCodeFailed.ToString());
+            }
+        }
+        public static string TransactionRequestSuccess
+        {
+            get
+            {
+                //TO DO
+                return ResourceMgr.GetString(AuditEventTypes.TransactionRequestSuccess.ToString());
+            }
+        }
+        public static string TransactionRequestFailed
+        {
+            get
+            {
+                //TO DO
+                return ResourceMgr.GetString(AuditEventTypes.TransactionRequestFailed.ToString());
             }
         }
 

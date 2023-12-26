@@ -42,14 +42,26 @@ namespace BankingAudit
             //    sw.WriteLine(fileInput);
             //    Console.WriteLine(fileInput);
             //}
+            int index = tp.TransactionsList.Count;
+            if (index > 0)
+            {
+                index -= 1;
+            }
             try
             {
-                Audit.BankingAuditSuccess(tp.BankName);
+                if (tp.TransactionsList == null)
+                {
+                    Audit.BankingAuditSuccess(tp.BankName, tp.AccountName, tp.TimeOfDetection, 0);
+                }
+                else
+                {
+                    Audit.BankingAuditSuccess(tp.BankName, tp.AccountName, tp.TimeOfDetection, tp.TransactionsList[index].Svota);
+                }
             }
             catch (Exception e)
             {
-                Console.WriteLine("Sertificate Creation failed with an error: " + e.Message);
-                Audit.BankingAuditFailed(tp.BankName);
+                Audit.BankingAuditFailed(tp.BankName, tp.AccountName, tp.TimeOfDetection, 0);
+                Console.WriteLine("BankingAudit failed with an error: " + e.Message);
             }
         }
     }

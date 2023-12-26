@@ -43,24 +43,26 @@ namespace BankService
                     IMDatabase.AccountsDB[brojNaloga].Pin = pin;
                     
                     Json.SaveAccountsToFile(IMDatabase.AccountsDB);
+                    Audit.ResetPinCodeSuccess(clientName);
                     return true;
                 }
                 else
                 {
+                    Audit.ResetPinCodeFailed(clientName);
                     return false;
                 }
             }
             else
             {
+                Audit.ResetPinCodeFailed(clientName);
                 return false;
             }
         }
         public bool IzvrsiTransakciju(byte[] transaction, byte[] signature, byte[] encPin)
         {
-            
-
             string clientName = Common.Manager.Formatter.ParseName(ServiceSecurityContext.Current.PrimaryIdentity.Name);
             string secretKey = SecretKey.LoadKey(clientName);
+            Audit.TransactionRequestSuccess(clientName);
 
             try
             {
@@ -77,47 +79,7 @@ namespace BankService
                     if (decTrans.Akcija == 1)
                     {
                         if (IMDatabase.AccountsDB.ContainsKey(decTrans.BrojRacuna))
-                        {
-                            // proveriti jel ovo okej mesto ili treba samo ako je pin tacan.
-                            if (IsMaxNumberOfTransactionsExceeded(decTrans, currentTime, out List<TransactionDetails> listOfTransactionDetails))
-                            {
-                                Console.WriteLine("Preveliki broj transakcija na istom racunu!");
-                                // Izmeniti da bude drugi objekat, treba nam Audit za EventLog
-                                TransactionPayments tp = new TransactionPayments()
-                                {
-                                    BankName = "BankName",
-                                    AccountName = decTrans.BrojRacuna,
-                                    TimeOfDetection = currentTime,
-                                    TransactionsList = listOfTransactionDetails
-                                };
-
-                                try
-                                {
-                                    NetTcpBinding binding = new NetTcpBinding();
-                                    binding.Security.Mode = SecurityMode.Transport;
-                                    binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
-
-                                    ChannelFactory<IBankingAudit> factory = new ChannelFactory<IBankingAudit>(binding,
-                                    new EndpointAddress("net.tcp://localhost:8001/BankingAuditService"));
-
-                                    IBankingAudit serviceProxy = factory.CreateChannel();
-                                    serviceProxy.AccessingLog(tp);
-                                }
-                                catch(Exception e)
-                                {
-                                    Console.WriteLine(e.Message + "\n" + e.StackTrace);
-                                }
-                                //try
-                                //{
-                                //    Audit.BankingAuditSuccess(tp.BankName);
-                                //}
-                                //catch (Exception e)
-                                //{
-                                //    Console.WriteLine("Banking Audit failed with an error: " + e.Message);
-                                //    Audit.BankingAuditFailed(tp.BankName);
-                                //}
-                            }
-
+                        { 
                             byte[] key = Convert.FromBase64String(IMDatabase.AccountsDB[decTrans.BrojRacuna].Pin);
                             string keyPin = DecryptString(key, secretKey);
 
@@ -128,17 +90,19 @@ namespace BankService
                                 Json.SaveAccountsToFile(IMDatabase.AccountsDB);
 
                                 // Audit log
-                                //Audit.TransactionSuccess(clientName);
+                                Audit.TransactionSuccess(clientName);
 
                                 return true;
                             }
                             else
                             {
                                 Console.WriteLine($"Uneli ste los pin code");
+                                Audit.TransactionFailed(clientName);
                             }
                         }
                         else
                         {
+                            Audit.TransactionFailed(clientName);
                             Console.WriteLine($"Neuspesna uplata! Ne postoji racun sa brojem {decTrans.BrojRacuna}");
                             return false;
                         }
@@ -150,6 +114,30 @@ namespace BankService
                             byte[] key = Convert.FromBase64String(IMDatabase.AccountsDB[decTrans.BrojRacuna].Pin);
                             string keyPin = DecryptString(key, secretKey);
 
+                            if (IsMaxNumberOfTransactionsExceeded(decTrans, currentTime, out List<TransactionDetails> listOfTransactionDetails))
+                            {
+                                NetTcpBinding binding = new NetTcpBinding();
+                                binding.Security.Mode = SecurityMode.Transport;
+                                binding.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
+
+                                ChannelFactory<IBankingAudit> factory = new ChannelFactory<IBankingAudit>(binding,
+                                new EndpointAddress("net.tcp://localhost:4003/BankingAuditService"));
+
+                                IBankingAudit serviceProxy = factory.CreateChannel();
+
+                                Console.WriteLine("Prevelik broj transakcija na istom racunu!");
+
+                                TransactionPayments tp = new TransactionPayments()
+                                {
+                                    BankName = "BankName",
+                                    AccountName = decTrans.BrojRacuna,
+                                    TimeOfDetection = currentTime,
+                                    TransactionsList = listOfTransactionDetails
+                                };
+
+                                serviceProxy.AccessingLog(tp);
+                            }
+
                             if (keyPin.Equals(pin))
                             {
 
@@ -157,21 +145,26 @@ namespace BankService
 
                                 if (trenutnoStanje < decTrans.Svota)
                                 {
+                                    Audit.PaymentFailed(clientName);
                                     Console.WriteLine($"Na racunu nemate dovoljno sretstava za isplatu!");
                                     return false;
                                 }
                                 IMDatabase.AccountsDB[decTrans.BrojRacuna].Stanje -= decTrans.Svota;
                                 Console.WriteLine($"Uspesna isplata!");
                                 Json.SaveAccountsToFile(IMDatabase.AccountsDB);
+
+                                Audit.PaymentSuccess(clientName);
                                 return true;
                             }
                             else
                             {
+                                Audit.PaymentFailed(clientName);
                                 Console.WriteLine($"Uneli ste los pin code");
                             }
                         }
                         else
                         {
+                            Audit.PaymentFailed(clientName);
                             Console.WriteLine($"Neuspesna uplata!Ne postoji racun sa brojem {decTrans.BrojRacuna} ili ste uneli los pin kod.");
                             return false;
                         }

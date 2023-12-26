@@ -52,7 +52,7 @@ namespace BankService
 
             #region BankingAudit
             NetTcpBinding bindingAudit = new NetTcpBinding();
-            string bankAuditAddress = "net.tcp://localhost:8001/BankingAuditService";
+            string bankAuditAddress = "net.tcp://localhost:4003/BankingAuditService";
             bindingAudit.Security.Mode = SecurityMode.Transport;
             bindingAudit.Security.Transport.ClientCredentialType = TcpClientCredentialType.Windows;
             bindingAudit.Security.Transport.ProtectionLevel = System.Net.Security.ProtectionLevel.EncryptAndSign;
@@ -74,7 +74,7 @@ namespace BankService
                 Console.WriteLine("Replikator server");
 
                 hostWinBankingAudit.Open();
-                Console.WriteLine(hostWinBankingAudit);
+                Console.WriteLine("Banking audit server");
 
                 Console.ReadKey(); 
             }

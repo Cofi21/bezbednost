@@ -118,10 +118,28 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="BankingAuditFailed" xml:space="preserve">
-    <value>Transaction exceeded failed! {0}</value>
+    <value>Transaction exceeded failed! {0} {1} {2} {3}</value>
   </data>
   <data name="BankingAuditSuccess" xml:space="preserve">
-    <value>Transaction exceeded! {0}</value>
+    <value>Transaction exceeded! {0} {1} {2} {3}</value>
+  </data>
+  <data name="PaymentFailed" xml:space="preserve">
+    <value>Withdraw failed {0}</value>
+  </data>
+  <data name="PaymentSuccess" xml:space="preserve">
+    <value>Withdraw successful {0}</value>
+  </data>
+  <data name="PullAndCreateFailed" xml:space="preserve">
+    <value>Pull and create failed {0}</value>
+  </data>
+  <data name="PullAndCreateSuccess" xml:space="preserve">
+    <value>Pull and create is successful {0}</value>
+  </data>
+  <data name="ResetPinCodeFailed" xml:space="preserve">
+    <value>Reset pin code failed {0}</value>
+  </data>
+  <data name="ResetPinCodeSuccess" xml:space="preserve">
+    <value>Reset pin code is successful {0}</value>
   </data>
   <data name="SertificateCreationFailed" xml:space="preserve">
     <value>Sertificate creation failed {0}</value>
@@ -129,7 +147,13 @@
   <data name="SertificateCreationSuccess" xml:space="preserve">
     <value>Sertificate is successfully created {0}</value>
   </data>
+  <data name="TransactionFailed" xml:space="preserve">
+    <value>Deposit failed! {0}</value>
+  </data>
+  <data name="TransactionRequestSuccess" xml:space="preserve">
+    <value>Transaction request is successful {0}</value>
+  </data>
   <data name="TransactionSuccess" xml:space="preserve">
-    <value>Transaction is successfull {0}</value>
+    <value>Deposit is successfull {0}</value>
   </data>
 </root>

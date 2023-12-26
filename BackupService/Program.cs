@@ -30,6 +30,9 @@ namespace BackupService
                 hostWin.Open();
                 Console.WriteLine("Backup server...");
 
+                ChannelFactory<IReplikator> channelFactory = new ChannelFactory<IReplikator>(bindingWin, new EndpointAddress(addressWin));
+                IReplikator replicator = channelFactory.CreateChannel();
+
                 while (true)
                 {
                     Thread.Sleep(4000);
