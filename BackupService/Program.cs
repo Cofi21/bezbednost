@@ -35,7 +35,7 @@ namespace BackupService
 
                 while (true)
                 {
-                    Thread.Sleep(4000);
+                    Thread.Sleep(10000);
                 }
             }catch(Exception e)
             {

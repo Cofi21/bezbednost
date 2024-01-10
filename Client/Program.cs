@@ -27,13 +27,14 @@ namespace Client
             string logged = WindowsIdentity.GetCurrent().Name;
             string[] parts = logged.Split('\\');
             string username = parts[1];
-
-            string tajniKljuc = SecretKey.LoadKey(username);
-            if(string.IsNullOrEmpty(tajniKljuc))
+            if (File.Exists(username))
+            {
+                string tajniKljuc = SecretKey.LoadKey(username);
+            }
+            else //(string.IsNullOrEmpty(tajniKljuc))
             {
                 string secretKey = SecretKey.GenerateKey();
                 SecretKey.StoreKey(secretKey, username);
-                Console.WriteLine("Uspesno izgenerisan " + secretKey);
             }
 
             while (true)

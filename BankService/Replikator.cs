@@ -21,7 +21,7 @@ namespace BankService
             Console.WriteLine("Primljeni podaci o nalozima:");
             foreach (var acc in accounts)
             {
-                Console.WriteLine($"Broj računa: {acc.BrojRacuna}, Stanje na računu: {acc.Stanje}");
+                Console.WriteLine($"Korisnik: {acc.Username} Broj računa: {acc.BrojRacuna}, Stanje na računu: {acc.Stanje}");
             }
         }
 

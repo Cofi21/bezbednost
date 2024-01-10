@@ -78,7 +78,7 @@ namespace BankService
                     
                     if (decTrans.Akcija == 1)
                     {
-                        if (IMDatabase.AccountsDB.ContainsKey(decTrans.BrojRacuna))
+                        if (IMDatabase.AccountsDB.ContainsKey(decTrans.BrojRacuna) && IMDatabase.AccountsDB[decTrans.BrojRacuna].Username.Equals(clientName))
                         { 
                             byte[] key = Convert.FromBase64String(IMDatabase.AccountsDB[decTrans.BrojRacuna].Pin);
                             string keyPin = DecryptString(key, secretKey);

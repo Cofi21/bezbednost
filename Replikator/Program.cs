@@ -45,7 +45,7 @@ namespace Replikator
                         Console.WriteLine("Repliciranje...");
                     }
 
-                    Thread.Sleep(4000);
+                    Thread.Sleep(10000);
                 }
                 catch (Exception e)
                 {

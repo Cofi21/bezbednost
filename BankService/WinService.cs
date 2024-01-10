@@ -130,7 +130,6 @@ namespace BankService
 
                 
                 string output = process.StandardOutput.ReadToEnd();
-                Console.WriteLine("Makecert izlaz: " + output);
                 string pin1;
                 if (!int.TryParse(pin, out int num))
                 {
@@ -142,7 +141,6 @@ namespace BankService
                 pin1 = pin;
 
                 string cmd2 = "/c pvk2pfx.exe /pvk " + name + ".pvk /pi " + pin1 + " /spc " + name + ".cer /pfx " + name + ".pfx";
-                Console.WriteLine(cmd2);
                 var process2 = System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo()
                 {
                     FileName = "cmd.exe",
@@ -156,7 +154,6 @@ namespace BankService
                 process2.WaitForExit();
 
                 string output2 = process2.StandardOutput.ReadToEnd();
-                Console.WriteLine("pfx izlaz:" + output2);
 
                 // Audit log
                 try
